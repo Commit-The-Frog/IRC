@@ -4,7 +4,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
-using namespace std;
+#include "Command.hpp"
 
 class Client
 {
@@ -19,6 +19,8 @@ class Client
 		Client(int client_fd, string server_pwd);
 		~Client();
 		void setRecvBuff(const string& data);
+		string getSendBuff() const;
+		void clearSendBuff();
 };
 
 #endif
