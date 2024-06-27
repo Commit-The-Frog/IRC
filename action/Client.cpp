@@ -23,8 +23,8 @@ void Client::setRecvBuff(const string& data) {
 		clrf_idx = recv_buff.find("\r\n");
 		if (clrf_idx == string::npos)
 			return;
-		substr_data = recv_buff.substr(0, 7);
-		recv_buff = recv_buff.substr(7);
+		substr_data = recv_buff.substr(0, clrf_idx);
+		recv_buff = recv_buff.substr(clrf_idx+2);
 		// cout << substr_data << endl;
 		// 파싱 후 Command객체에 저장 (미구현)
 
