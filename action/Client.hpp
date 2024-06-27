@@ -10,14 +10,15 @@ class Client
 {
 	private:
 		int client_fd;
-		const string server_pwd;
 		string send_buff;
 		string recv_buff;
 		string nickname;
 		string username;
+		// map<Channel> channel_list;
 	public:
 		Client(int client_fd, string server_pwd);
 		~Client();
+		void addRecvBuff(const string& data);
 		void setRecvBuff(const string& data);
 		string getSendBuff() const;
 		void clearSendBuff();
