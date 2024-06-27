@@ -60,7 +60,7 @@ const char* Server::ClientAcceptError::what() const throw(){
 	return ("Client Accept Exception!!");
 }
 
-void	chage_events(std::vector<struct kevent> change_list, uintptr_t ident, int16_t filter, uint16_t flags)
+void	Server::changeEvents(std::vector<struct kevent> change_list, uintptr_t ident, int16_t filter, uint16_t flags)
 {
 	struct kevent temp_event;
 
@@ -80,7 +80,7 @@ void	Server::run()
 	serverSocketListen(event_size);
 	initKq();
 	fcntl(serv_sock_fd, F_SETFL, O_NONBLOCK);
-	chage_events(change_list, serv_sock_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
+	changeEvents(change_list, serv_sock_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
 	while(true)
 	{
 		int event_cnt = kevent(kq, &change_list[0], change_list.size(), event_list, event_size, NULL);
@@ -121,8 +121,8 @@ void	Server::clientRegister(std::vector<struct kevent> change_list)
 	if (client_fd < 0)
 		throw Server::ClientAcceptError();
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
-	chage_events(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
-	chage_events(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
+	changeEvents(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
+	changeEvents(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
 	client_list[client_fd] = new Client(client_fd);
 }
 
@@ -132,7 +132,7 @@ void	Server::clientRecvEvent(struct kevent *curr_event, Client *client)
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes < 0)
 	{
-		disconnect_client(curr_event->ident, client_list);
+		disconnectClient(curr_event->ident, client_list);
 	}
 	else{
 		buffer[bytes] = '\0';
@@ -147,14 +147,14 @@ void	Server::clientSendEvent(struct kevent *curr_event, Client *client)
 		int bytes = send(curr_event->ident, client->getSendBuff(), client->getSendBuff().size(),0);
 		if (bytes < 0)
 		{
-			disconnect_client(curr_event->ident, client_list);
+			disconnectClient(curr_event->ident, client_list);
 		}
 		else
 			client->sendBuffClear();
 	}
 }
 
-void	Server::disconnect_client(int client_fd, map<int, Client *>&client_list)
+void	Server::disconnectClient(int client_fd, map<int, Client *>&client_list)
 {
 	close(client_fd);
 	client_list.erase(client_fd);

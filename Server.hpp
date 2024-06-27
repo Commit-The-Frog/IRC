@@ -1,16 +1,16 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include <string>
-# include <exception>
-# include <sys/socket.h>
-# include <netinet/in.h>
+#include <string>
+#include <exception>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <sys/event.h>
 #include <vector>
 #include <map>
 #include <fcntl.h>
 #include <unistd.h>
-// # include "Client.hpp"
+// #include "Client.hpp"
 
 using namespace std;
 
@@ -40,7 +40,8 @@ class Server
 		void	clientRegister(std::vector<struct kevent> change_list);
 		void	clientRecvEvent(struct kevent *curr_event, Client *client);
 		void	clientSendEvent(struct kevent *curr_event, Client *client);
-		void	disconnect_client(int client_fd, map<int, Client *>&client_list);
+		void	disconnectClient(int client_fd, map<int, Client *>&client_list);
+		void	changeEvents(std::vector<struct kevent> change_list, uintptr_t ident, int16_t filter, uint16_t flags);
 		
 
 		class ServerSocketBindException : public exception{
