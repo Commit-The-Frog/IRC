@@ -74,7 +74,7 @@ void	Server::run()
 	std::vector<struct kevent> change_list;
 	struct kevent event_list[event_size];
 	struct kevent *curr_event;
-	std::map<int, Client *>::iterator it;
+	std::map<int, Client>::iterator it;
 
 	serverSocketBind();
 	serverSocketListen(event_size);
@@ -91,7 +91,7 @@ void	Server::run()
 		{
 			curr_event = &event_list[i];
 			it = client_list.find(curr_event->ident);
-			if (curr_event->ident == EVFILT_READ)
+			if (curr_event->filter == EVFILT_READ)
 			{
 				if (curr_event->ident == serv_sock_fd)
 				{
@@ -102,7 +102,7 @@ void	Server::run()
 					if (it != client_list.end())
 						clientRecvEvent(curr_event, it->second);
 				}
-			}else if (curr_event->ident == EVFILT_WRITE)
+			}else if (curr_event->filter == EVFILT_WRITE)
 			{
 				if (it != client_list.end())
 					clientSendEvent(curr_event, it->second);
@@ -122,11 +122,11 @@ void	Server::clientRegister(std::vector<struct kevent> change_list)
 		throw Server::ClientAcceptError();
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	changeEvents(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
-	changeEvents(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
-	client_list[client_fd] = new Client(client_fd);
+	changeEvents(change_list, client_fd, EVFILT_WRITE, EV_ADD | EV_ENABLE);
+	client_list[client_fd] = Client(client_fd);
 }
 
-void	Server::clientRecvEvent(struct kevent *curr_event, Client *client)
+void	Server::clientRecvEvent(struct kevent *curr_event, Client &client)
 {
 	char	buffer[512];
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
@@ -136,25 +136,25 @@ void	Server::clientRecvEvent(struct kevent *curr_event, Client *client)
 	}
 	else{
 		buffer[bytes] = '\0';
-		client->setRecvBuff(buffer);
+		client.setRecvBuff(buffer);
 	}
 }
 
-void	Server::clientSendEvent(struct kevent *curr_event, Client *client)
+void	Server::clientSendEvent(struct kevent *curr_event, Client &client)
 {
-	if (client->getSendBuff() != "")
+	if (client.getSendBuff() != "")
 	{
-		int bytes = send(curr_event->ident, client->getSendBuff(), client->getSendBuff().size(),0);
+		int bytes = send(curr_event->ident, client.getSendBuff(), client.getSendBuff().size(),0);
 		if (bytes < 0)
 		{
 			disconnectClient(curr_event->ident, client_list);
 		}
 		else
-			client->sendBuffClear();
+			client.sendBuffClear();
 	}
 }
 
-void	Server::disconnectClient(int client_fd, map<int, Client *>&client_list)
+void	Server::disconnectClient(int client_fd, map<int, Client>&client_list)
 {
 	close(client_fd);
 	client_list.erase(client_fd);
