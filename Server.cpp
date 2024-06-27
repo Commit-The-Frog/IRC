@@ -86,6 +86,7 @@ void	Server::run()
 		int event_cnt = kevent(kq, &change_list[0], change_list.size(), event_list, event_size, NULL);
 		if (event_cnt < 0)
 			throw Server::KeventError();
+		change_list.clear();
 		for (int i = 0; i < event_cnt; i++)
 		{
 			curr_event = &event_list[i];
