@@ -135,21 +135,21 @@ void	Server::clientRecvEvent(struct kevent *curr_event, Client *client)
 	}
 	else{
 		buffer[bytes] = '\0';
-		client->addRecvBuffer(buffer);
+		client->setRecvBuff(buffer);
 	}
 }
 
 void	Server::clientSendEvent(struct kevent *curr_event, Client *client)
 {
-	if (client->getSendBuffer() != "")
+	if (client->getSendBuff() != "")
 	{
-		int bytes = send(curr_event->ident, client->getSendBuffer(), client->getSendBufferSize(),0);
+		int bytes = send(curr_event->ident, client->getSendBuff(), client->getSendBuff().size(),0);
 		if (bytes < 0)
 		{
 			disconnect_client(curr_event->ident, client_list);
 		}
 		else
-			client->sendBufferClear();
+			client->sendBuffClear();
 	}
 }
 
