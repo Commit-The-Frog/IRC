@@ -28,14 +28,6 @@ void	Server::initKq() {
 		throw Server::KqueueInitException();
 }
 
-void	Server::addKqEventListener(int socket, int16_t filter) {
-	struct kevent	change;
-
-	EV_SET(&change, socket, filter, EV_ADD | EV_ENABLE, 0, 0, NULL);
-	if (kevent(this->kq, &change, 1, NULL, 0, NULL) < 0)
-		throw Server::KeventSettingError();
-}
-
 const char* Server::ServerSocketBindException::what() const throw() {
 	return ("Server Socket Bind Exception!!");
 }
@@ -60,6 +52,9 @@ const char* Server::ClientAcceptError::what() const throw(){
 	return ("Client Accept Exception!!");
 }
 
+/*	[changeEvents]
+	Add event listener and reciever
+*/
 void	Server::changeEvents(std::vector<struct kevent> change_list, uintptr_t ident, int16_t filter, uint16_t flags)
 {
 	struct kevent temp_event;
@@ -95,23 +90,23 @@ void	Server::run()
 			{
 				if (curr_event->ident == serv_sock_fd)
 				{
-					clientRegister(change_list);
+					registerClient(change_list);
 				}
 				else
 				{
 					if (it != client_list.end())
-						clientRecvEvent(curr_event, it->second);
+						recvEventFromClient(curr_event, it->second);
 				}
 			}else if (curr_event->filter == EVFILT_WRITE)
 			{
 				if (it != client_list.end())
-					clientSendEvent(curr_event, it->second);
+					sendEventToClient(curr_event, it->second);
 			}
 		}
 	}
 }
 
-void	Server::clientRegister(std::vector<struct kevent> change_list)
+void	Server::registerClient(std::vector<struct kevent> change_list)
 {
 	struct sockaddr_in client_addr;
 	socklen_t	client_len = sizeof(client_addr);
@@ -126,7 +121,7 @@ void	Server::clientRegister(std::vector<struct kevent> change_list)
 	client_list[client_fd] = Client(client_fd);
 }
 
-void	Server::clientRecvEvent(struct kevent *curr_event, Client &client)
+void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
 {
 	char	buffer[512];
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
@@ -140,7 +135,7 @@ void	Server::clientRecvEvent(struct kevent *curr_event, Client &client)
 	}
 }
 
-void	Server::clientSendEvent(struct kevent *curr_event, Client &client)
+void	Server::sendEventToClient(struct kevent *curr_event, Client &client)
 {
 	if (client.getSendBuff() != "")
 	{
