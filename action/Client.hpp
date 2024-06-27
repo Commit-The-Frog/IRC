@@ -4,7 +4,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
-#include "Command.hpp"
+using namespace std;
 
 class Client
 {
