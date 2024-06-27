@@ -16,11 +16,17 @@ class Client
 		string username;
 		// map<Channel> channel_list;
 	public:
-		Client(int client_fd, string server_pwd);
+		Client();
+		Client(int client_fd);
 		~Client();
+		void setNickname(const string&);
+		string getNickname();
+		void setUsername(const string&);
+		string getUsername();
 		void addRecvBuff(const string& data);
 		void setRecvBuff(const string& data);
 		string getSendBuff() const;
+		void setSendBuff(const string& data);
 		void clearSendBuff();
 };
 
