@@ -6,6 +6,10 @@
 # include <sys/socket.h>
 # include <netinet/in.h>
 #include <sys/event.h>
+#include <vector>
+#include <map>
+#include <fcntl.h>
+#include <unistd.h>
 // # include "Client.hpp"
 
 using namespace std;
@@ -20,7 +24,8 @@ class Server
 		struct sockaddr_in	serv_addr;
 		int					serv_sock_fd;
 		int					kq;
-		Client				*client_list;
+		std::map<int, Client *>client_list;
+		//Client				*client_list;
 
 		Server();
 		void	addKqEventListener(int socket, int16_t filter); // try 필요
@@ -32,6 +37,11 @@ class Server
 		void	serverSocketListen(int listen_queue_size); // error throw 예정
 		void	initKq(); // try 필요
 		void	run(); // 무한루프로 소켓 확인.
+		void	clientRegister(std::vector<struct kevent> change_list);
+		void	clientRecvEvent(struct kevent *curr_event, Client *client);
+		void	clientSendEvent(struct kevent *curr_event, Client *client);
+		void	disconnect_client(int client_fd, map<int, Client *>&client_list);
+		
 
 		class ServerSocketBindException : public exception{
 			public:
@@ -49,6 +59,14 @@ class Server
 			public:
 				virtual const char* what() const throw();
 		};
+		class KeventError : public exception{
+			public:
+				virtual const char* what() const throw();
+		};
+		class ClientAcceptError : public exception{
+			public:
+				virtual const char* what() const throw();
+		}
 };
 
 #endif
