@@ -1,9 +1,9 @@
 NAME = Ircserv
 CPP = c++
 CPPFLAGS = -MMD -MP -std=c++98
-SRC = main.cpp\
-	Server.cpp\
-	action/Client.cpp\
+SRC = main.cpp \
+	server/Server.cpp \
+	action/Client.cpp \
 	parser/Parser.cpp
 
 OBJ = $(SRC:.cpp=.o)
