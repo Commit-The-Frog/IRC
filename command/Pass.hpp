@@ -20,7 +20,7 @@ class Pass : public Command
 			- client_fd에 해당하는 사용자의 send_buff에 응답 저장 
 		*/
 		void execute(const Parser& parser, int client_fd) {
-			if (parser.getParams().at(0) == this->server_pwd)
+			if (parser.getParams() == this->server_pwd)
 				cout << "password correct" << endl;
 			else
 				cout << "password incorrect" << endl;
