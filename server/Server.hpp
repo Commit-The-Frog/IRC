@@ -10,10 +10,10 @@
 #include <map>
 #include <fcntl.h>
 #include <unistd.h>
-#include "action/Client.hpp"
-#include "command/Pass.hpp"
-#include "command/Command.hpp"
-#include "parser/Parser.hpp"
+#include "../action/Client.hpp"
+#include "../command/Pass.hpp"
+#include "../command/Command.hpp"
+#include "../parser/Parser.hpp"
 enum {
 	PASS,
 	NICK,

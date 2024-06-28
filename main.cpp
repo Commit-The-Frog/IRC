@@ -2,7 +2,7 @@
 #include "command/Command.hpp"
 #include "command/Pass.hpp"
 #include "parser/Parser.hpp"
-#include "Server.hpp"
+#include "server/Server.hpp"
 #include <vector>
 #include <sstream>
 
