@@ -25,6 +25,7 @@ class Pass : public Command
 				cout << "password correct" << endl;
 			else
 				cout << "password incorrect" << endl;
+			client_map[client_fd].setSendBuff("너 통과");
 		};
 };
 

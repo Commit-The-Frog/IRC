@@ -43,7 +43,7 @@ class CommandFactory
 			// ...
 			else
 				throw invalid_argument("COMMAND NOT FOUND");
-			return cmd_map.find(PASS)->second;
+			return cmd_map.find(cmd_type)->second;
 		};
 };
 
