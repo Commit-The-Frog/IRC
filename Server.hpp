@@ -34,7 +34,6 @@ class Server
 		int					serv_sock_fd;
 		int					kq;
 		std::map<int, Client>client_list;
-		Command cmd;
 		std::map<int, Command *>cmd_map;
 		//Client				*client_list;
 
