@@ -20,59 +20,59 @@ Channel &Channel::operator=(Channel const &channel) {
 		options[i]  = channel.options[i];
 }
 
-void Channel::addOperatorMap(int fd, Client &client) {
-	operator_map[fd] = client;
+void Channel::addOperator(string nick, Client &client) {
+	operator_map[nick] = client;
 }
 
-void Channel::deleteOperatorMap(int fd , Client &client) {
-	operator_map.erase(fd);
+void Channel::deleteOperator(string nick, Client &client) {
+	operator_map.erase(nick);
 }
 
-void Channel::addMemberMap(int fd, Client &client) {
-	member_map[fd] = client;
+void Channel::addMember(string nick, Client &client) {
+	member_map[nick] = client;
 }
 
-void Channel::deleteMemberMap(int fd , Client &client) {
-	member_map.erase(fd);
+void Channel::deleteMember(string nick, Client &client) {
+	member_map.erase(nick);
 }
 
-void Channel::addInviteMap(int fd, Client &client) {
-	inivite_map[fd] = client;
+void Channel::addInvite(string nick, Client &client) {
+	inivite_map[nick] = client;
 }
 
-void Channel::deleteInviteMap(int fd , Client &client) {
-	inivite_map.erase(fd);
+void Channel::deleteInvite(string nick, Client &client) {
+	inivite_map.erase(nick);
 }
 
-std::map<int, Client> &Channel::getOperatorMap() {
+std::map<string, Client> &Channel::getOperatorMap() const {
 	return operator_map;
 }
 
-std::map<int, Client> &Channel::getMemberMap() {
+std::map<string, Client> &Channel::getMemberMap() const {
 	return member_map;
 }
 
-std::map<int, Client> &Channel::getInviteMap() {
+std::map<string, Client> &Channel::getInviteMap() const {
 	return inivite_map;
 }
 
-void Channel::setKey(std::string str) {
+void Channel::setKey(string str) {
 	key = str;
 }
 
-std::string &Channel::getKey() {
+string &Channel::getKey() const {
 	return key;
 }
 
-void Channel::setTopic(std::string str) {
+void Channel::setTopic(string str) {
 	key = str;
 }
 
-void Channel::setTopic(std::string str) {
+void Channel::setTopic(string str) {
 	topic = str;
 }
 
-std::string &Channel::getTopic() {
+string &Channel::getTopic() const {
 	return topic;
 }
 
