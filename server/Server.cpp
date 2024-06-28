@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_list, channel_list, pwd) {
+Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_list, pwd) {
 	this->serv_sock_fd = socket(PF_INET, SOCK_STREAM, 0);
 	memset(&this->serv_addr, 0, sizeof(this->serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -152,7 +152,7 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 			client.setRecvBuff(client_recv_buff);
 			Parser parsed_data = Parser(substr_data);
 			try {
-				commandFactory.generateCommand(parsed_data)->execute(parsed_data);
+				commandFactory.generateCommand(parsed_data)->execute(parsed_data, curr_event->ident);
 			} catch (exception& e) { // unknown command exception 만 catch 필요.
 				// unknown command에 대한 처리 필요 421) unknown command
 			}
