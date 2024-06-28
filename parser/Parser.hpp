@@ -6,8 +6,7 @@
 #include <sstream>
 using namespace std;
 
-class Parser
-{
+class Parser {
 	private:
 		string raw;
 		string cmd;
