@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int port, string pwd): _port(port), _pwd(pwd) {
+Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_list, channel_list, pwd) {
 	this->serv_sock_fd = socket(PF_INET, SOCK_STREAM, 0);
 	memset(&this->serv_addr, 0, sizeof(this->serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -12,22 +12,25 @@ Server::~Server() {
 	client_list.clear();
 }
 
-void	Server::cmdMapInit()
-{
-	this->cmd_map[PASS] = new Pass(client_list, this->_pwd);
-
-}
-
+/*	[serverSocketBind]
+	bind created socket with address
+*/
 void	Server::serverSocketBind() {
 	if (::bind(this->serv_sock_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
 		throw Server::ServerSocketBindException();
 }
 
+/*	[serverSocketListen]
+	listen socket
+*/
 void	Server::serverSocketListen(int listen_queue_size) {
 	if (listen(this->serv_sock_fd, listen_queue_size) < 0)
 		throw Server::ServerSocketListenException();
 }
 
+/*	[initKq]
+	get kqueue file discripter
+*/
 void	Server::initKq() {
 	this->kq = kqueue();
 	if (this->kq < 0)
@@ -50,27 +53,25 @@ const char* Server::KeventSettingError::what() const throw() {
 	return ("Kevent Setting Exception!!");
 }
 
-const char* Server::KeventError::what() const throw(){
+const char* Server::KeventError::what() const throw() {
 	return ("Kevent Exception!!");
 }
 
-const char* Server::ClientAcceptError::what() const throw(){
+const char* Server::ClientAcceptError::what() const throw() {
 	return ("Client Accept Exception!!");
 }
 
 /*	[changeEvents]
 	Add event listener and reciever
 */
-void	Server::changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags)
-{
+void	Server::changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags) {
 	struct kevent temp_event;
 
 	EV_SET(&temp_event, ident, filter, flags, 0, 0, NULL);
 	change_list.push_back(temp_event);
 }
 
-void	Server::run()
-{
+void	Server::run() {
 	int event_size = 10;
 	std::vector<struct kevent> change_list;
 	struct kevent event_list[event_size];
@@ -82,30 +83,22 @@ void	Server::run()
 	initKq();
 	fcntl(serv_sock_fd, F_SETFL, O_NONBLOCK);
 	changeEvents(change_list, serv_sock_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
-	cmdMapInit();
-	while(true)
-	{
+	while(true) {
 		int event_cnt = kevent(kq, change_list.data(), change_list.size(), event_list, event_size, NULL);
 		if (event_cnt < 0)
 			throw Server::KeventError();
 		change_list.clear();
-		for (int i = 0; i < event_cnt; i++)
-		{
+		for (int i = 0; i < event_cnt; i++) {
 			curr_event = &event_list[i];
 			it = client_list.find(curr_event->ident);
-			if (curr_event->filter == EVFILT_READ)
-			{
-				if ((int) curr_event->ident == serv_sock_fd)
-				{
+			if (curr_event->filter == EVFILT_READ) {
+				if (static_cast<int>(curr_event->ident) == serv_sock_fd) {
 					registerClient(change_list);
-				}
-				else
-				{
+				} else {
 					if (it != client_list.end())
 						recvEventFromClient(curr_event, it->second);
 				}
-			}else if (curr_event->filter == EVFILT_WRITE)
-			{
+			} else if (curr_event->filter == EVFILT_WRITE) {
 				if (it != client_list.end())
 					sendEventToClient(curr_event, it->second);
 			}
@@ -113,6 +106,10 @@ void	Server::run()
 	}
 }
 
+/*	[registerClient]
+	accept the connection requset
+	add event listener for new socket to kqueue
+*/
 void	Server::registerClient(std::vector<struct kevent>& change_list)
 {
 	struct sockaddr_in client_addr;
@@ -129,9 +126,17 @@ void	Server::registerClient(std::vector<struct kevent>& change_list)
 	cout << client_fd << " Connect in" << endl;
 }
 
+/*	[recvEventFromClient]
+	1. 	Recive event from client
+	2. 	Get Command instance for execute
+	3. 	Execute Command instance
+		(Command instance will put output to client's recive buff)
+*/
 void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
 {
-	char	buffer[512];
+	char			buffer[512];
+	unsigned long	clrf_idx;
+	Command			*cmd;
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes < 0)
 	{
@@ -144,23 +149,26 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
 		while (true)
 		{
 			string client_recv_buff = client.getRecvBuff();
-			unsigned long clrf_idx;
 			if ((clrf_idx = client_recv_buff.find("\r\n")) == string::npos)
 				break;
 			string substr_data = client_recv_buff.substr(0, clrf_idx);
 			client_recv_buff = client_recv_buff.substr(clrf_idx + 2);
 			client.setRecvBuff(client_recv_buff);
-			Parser cmd = Parser(substr_data);
-			if (cmd.getCmd() == "PASS")
-			{
-				cmd_map[PASS]->execute(cmd, curr_event->ident);
+			Parser parsed_data = Parser(substr_data);
+			try {
+				commandFactory.generateCommand(parsed_data)->excute(parsed_data);
+				cmd.execute(parsed_data);
+			} catch (exception& e) { // unknown command exception 만 catch 필요.
+				// unknown command에 대한 처리 필요 421) unknown command
 			}
-			// substr_data를 파싱객체에 넣어서 파싱
-			// 파싱한 데이터를 각각 넣어서 execute
 		}
 	}
 }
 
+/*	[sendEventToClient]
+	If socket is available to send,
+	send data(in send_buff) to client
+*/
 void	Server::sendEventToClient(struct kevent *curr_event, Client &client)
 {
 	if (client.getSendBuff() != "")
