@@ -4,7 +4,8 @@ CPPFLAGS = -MMD -MP -std=c++98
 SRC = main.cpp \
 	server/Server.cpp \
 	action/Client.cpp \
-	parser/Parser.cpp
+	parser/Parser.cpp \
+	channel/Channel.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

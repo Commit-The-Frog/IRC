@@ -31,13 +31,13 @@ class Channel
 		void deleteMember(string nick, Client &client);
 		void addInvite(string nick, Client &client);
 		void deleteInvite(string nick, Client &client);
-		std::map<string, Client> &getOperatorMap() const;
-		std::map<string, Client> &getMemberMap() const;
-		std::map<string, Client> &getInviteMap() const;
+		const std::map<string, Client> &getOperatorMap() const;
+		const std::map<string, Client> &getMemberMap() const;
+		const std::map<string, Client> &getInviteMap() const;
 		void setKey(string str);
-		string &getKey() const;
+		const string &getKey() const;
 		void setTopic(string str);
-		string &getTopic() const;
+		const string &getTopic() const;
 		bool getModeOptionI() const;
 		bool getModeOptionT() const;
 		bool getModeOptionK() const;

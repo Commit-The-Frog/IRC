@@ -18,6 +18,7 @@ Channel &Channel::operator=(Channel const &channel) {
 	topic = channel.topic;
 	for (int i = 0; i <5; i++)
 		options[i]  = channel.options[i];
+	return (*this);
 }
 
 void Channel::addOperator(string nick, Client &client) {
@@ -44,15 +45,15 @@ void Channel::deleteInvite(string nick, Client &client) {
 	inivite_map.erase(nick);
 }
 
-std::map<string, Client> &Channel::getOperatorMap() const {
+const std::map<string, Client> &Channel::getOperatorMap() const {
 	return operator_map;
 }
 
-std::map<string, Client> &Channel::getMemberMap() const {
+const std::map<string, Client> &Channel::getMemberMap() const {
 	return member_map;
 }
 
-std::map<string, Client> &Channel::getInviteMap() const {
+const std::map<string, Client> &Channel::getInviteMap() const {
 	return inivite_map;
 }
 
@@ -60,19 +61,15 @@ void Channel::setKey(string str) {
 	key = str;
 }
 
-string &Channel::getKey() const {
+const string &Channel::getKey() const {
 	return key;
-}
-
-void Channel::setTopic(string str) {
-	key = str;
 }
 
 void Channel::setTopic(string str) {
 	topic = str;
 }
 
-string &Channel::getTopic() const {
+const string &Channel::getTopic() const {
 	return topic;
 }
 
