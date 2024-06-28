@@ -110,8 +110,7 @@ void	Server::run() {
 	accept the connection requset
 	add event listener for new socket to kqueue
 */
-void	Server::registerClient(std::vector<struct kevent>& change_list)
-{
+void	Server::registerClient(std::vector<struct kevent>& change_list) {
 	struct sockaddr_in client_addr;
 	socklen_t	client_len = sizeof(client_addr);
 	int client_fd;
@@ -132,22 +131,19 @@ void	Server::registerClient(std::vector<struct kevent>& change_list)
 	3. 	Execute Command instance
 		(Command instance will put output to client's recive buff)
 */
-void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
-{
+void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 	char			buffer[512];
 	unsigned long	clrf_idx;
 	Command			*cmd;
+
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
-	if (bytes < 0)
-	{
+	if (bytes < 0) {
 		disconnectClient(curr_event->ident, client_list);
-	}
-	else{
+	} else {
 		buffer[bytes] = '\0';
 		client.addRecvBuff(buffer);
 		// 여기서 파싱을 해야함.
-		while (true)
-		{
+		while (true) {
 			string client_recv_buff = client.getRecvBuff();
 			if ((clrf_idx = client_recv_buff.find("\r\n")) == string::npos)
 				break;
@@ -156,8 +152,7 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
 			client.setRecvBuff(client_recv_buff);
 			Parser parsed_data = Parser(substr_data);
 			try {
-				commandFactory.generateCommand(parsed_data)->excute(parsed_data);
-				cmd.execute(parsed_data);
+				commandFactory.generateCommand(parsed_data)->execute(parsed_data);
 			} catch (exception& e) { // unknown command exception 만 catch 필요.
 				// unknown command에 대한 처리 필요 421) unknown command
 			}
@@ -169,10 +164,8 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
 	If socket is available to send,
 	send data(in send_buff) to client
 */
-void	Server::sendEventToClient(struct kevent *curr_event, Client &client)
-{
-	if (client.getSendBuff() != "")
-	{
+void	Server::sendEventToClient(struct kevent *curr_event, Client &client) {
+	if (client.getSendBuff() != "") {
 		int bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(),0);
 		if (bytes < 0)
 		{
@@ -183,8 +176,7 @@ void	Server::sendEventToClient(struct kevent *curr_event, Client &client)
 	}
 }
 
-void	Server::disconnectClient(int client_fd, map<int, Client>&client_list)
-{
+void	Server::disconnectClient(int client_fd, map<int, Client>&client_list) {
 	close(client_fd);
 	client_list.erase(client_fd);
 }
