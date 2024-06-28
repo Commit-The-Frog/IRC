@@ -1,15 +1,16 @@
 #include "Parser.hpp"
 
-Parser::Parser(string& raw) :raw(raw)
-{
+Parser::Parser(string& raw) :raw(raw) {
 	stringstream ss(this->raw);
 	string tmp;
 
 	ss >> this->cmd;
-	if (ss.eof())
-		this->params = "";
-	else
-		this->params = ss.str();
+	transform(this->cmd.begin(), this->cmd.end(), this->cmd.begin(), ::toupper);
+	std::getline(ss, this->params);
+
+	if (!this->params.empty() && this->params[0] == ' ') {
+		this->params.erase(0, this->params.find_first_not_of(' '));
+	}
 }
 
 string Parser::getRaw() const {
