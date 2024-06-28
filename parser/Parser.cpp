@@ -6,14 +6,20 @@ Parser::Parser(string& raw) :raw(raw)
 	string tmp;
 
 	ss >> this->cmd;
-	ss >> tmp;
-	this->params.push_back(tmp);
+	if (ss.eof())
+		this->params = "";
+	else
+		this->params = ss.str();
+}
+
+string Parser::getRaw() const {
+	return raw;
 }
 
 string Parser::getCmd() const {
 	return cmd;
 }
 
-vector<string> Parser::getParams() const {
+string Parser::getParams() const {
 	return params;
 }
