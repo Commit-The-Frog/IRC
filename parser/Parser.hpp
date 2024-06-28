@@ -11,11 +11,12 @@ class Parser
 	private:
 		string raw;
 		string cmd;
-		vector<string> params;
+		string params;
 	public:
 		Parser(string&);
+		string getRaw() const;
 		string getCmd() const;
-		vector<string> getParams() const;
+		string getParams() const;
 };
 
 
