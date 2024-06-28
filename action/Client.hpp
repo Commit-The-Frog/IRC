@@ -25,6 +25,7 @@ class Client
 		string getUsername();
 		void addRecvBuff(const string& data);
 		void setRecvBuff(const string& data);
+		string getRecvBuff() const;
 		string getSendBuff() const;
 		void setSendBuff(const string& data);
 		void clearSendBuff();

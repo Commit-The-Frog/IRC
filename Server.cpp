@@ -12,6 +12,12 @@ Server::~Server() {
 	client_list.clear();
 }
 
+void	Server::cmdMapInit()
+{
+	this->cmd_map[PASS] = new Pass(client_list, this->_pwd);
+
+}
+
 void	Server::serverSocketBind() {
 	if (::bind(this->serv_sock_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
 		throw Server::ServerSocketBindException();
@@ -55,7 +61,7 @@ const char* Server::ClientAcceptError::what() const throw(){
 /*	[changeEvents]
 	Add event listener and reciever
 */
-void	Server::changeEvents(std::vector<struct kevent> change_list, uintptr_t ident, int16_t filter, uint16_t flags)
+void	Server::changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags)
 {
 	struct kevent temp_event;
 
@@ -76,9 +82,10 @@ void	Server::run()
 	initKq();
 	fcntl(serv_sock_fd, F_SETFL, O_NONBLOCK);
 	changeEvents(change_list, serv_sock_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
+	cmdMapInit();
 	while(true)
 	{
-		int event_cnt = kevent(kq, &change_list[0], change_list.size(), event_list, event_size, NULL);
+		int event_cnt = kevent(kq, change_list.data(), change_list.size(), event_list, event_size, NULL);
 		if (event_cnt < 0)
 			throw Server::KeventError();
 		change_list.clear();
@@ -88,7 +95,7 @@ void	Server::run()
 			it = client_list.find(curr_event->ident);
 			if (curr_event->filter == EVFILT_READ)
 			{
-				if (curr_event->ident == serv_sock_fd)
+				if ((int) curr_event->ident == serv_sock_fd)
 				{
 					registerClient(change_list);
 				}
@@ -106,7 +113,7 @@ void	Server::run()
 	}
 }
 
-void	Server::registerClient(std::vector<struct kevent> change_list)
+void	Server::registerClient(std::vector<struct kevent>& change_list)
 {
 	struct sockaddr_in client_addr;
 	socklen_t	client_len = sizeof(client_addr);
@@ -119,6 +126,7 @@ void	Server::registerClient(std::vector<struct kevent> change_list)
 	changeEvents(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
 	changeEvents(change_list, client_fd, EVFILT_WRITE, EV_ADD | EV_ENABLE);
 	client_list[client_fd] = Client(client_fd);
+	cout << client_fd << " Connect in" << endl;
 }
 
 void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
@@ -131,7 +139,25 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client)
 	}
 	else{
 		buffer[bytes] = '\0';
-		client.setRecvBuff(buffer);
+		client.addRecvBuff(buffer);
+		// 여기서 파싱을 해야함.
+		while (true)
+		{
+			string client_recv_buff = client.getRecvBuff();
+			unsigned long clrf_idx;
+			if ((clrf_idx = client_recv_buff.find("\r\n")) == string::npos)
+				break;
+			string substr_data = client_recv_buff.substr(0, clrf_idx);
+			client_recv_buff = client_recv_buff.substr(clrf_idx + 2);
+			client.setRecvBuff(client_recv_buff);
+			Parser cmd = Parser(substr_data);
+			if (cmd.getCmd() == "PASS")
+			{
+				cmd_map[PASS]->execute(cmd, curr_event->ident);
+			}
+			// substr_data를 파싱객체에 넣어서 파싱
+			// 파싱한 데이터를 각각 넣어서 execute
+		}
 	}
 }
 
@@ -139,13 +165,13 @@ void	Server::sendEventToClient(struct kevent *curr_event, Client &client)
 {
 	if (client.getSendBuff() != "")
 	{
-		int bytes = send(curr_event->ident, client.getSendBuff(), client.getSendBuff().size(),0);
+		int bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(),0);
 		if (bytes < 0)
 		{
 			disconnectClient(curr_event->ident, client_list);
 		}
 		else
-			client.sendBuffClear();
+			client.clearSendBuff();
 	}
 }
 

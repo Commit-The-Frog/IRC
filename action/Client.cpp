@@ -12,6 +12,10 @@ void Client::setRecvBuff(const string& data) {
 	recv_buff = data;
 }
 
+string Client::getRecvBuff() const {
+	return recv_buff;
+}
+
 string Client::getSendBuff() const {
 	return send_buff;
 }
