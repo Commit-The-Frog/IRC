@@ -14,6 +14,7 @@ class Pass : public Command
 		// :Command(client_map, channel_map), server_pwd(server_pwd) {};
 		Pass(map<int, Client>& client_map, const string& server_pwd)
 		:Command(client_map), server_pwd(server_pwd) {};
+		~Pass() {};
 		/* 
 			PASS 명령어 실행 :
 			- pwd 검증
@@ -24,7 +25,7 @@ class Pass : public Command
 				cout << "password correct" << endl;
 			else
 				cout << "password incorrect" << endl;
-			client_map[client_fd].setSendBuff("참 잘했어요");
+			client_map[client_fd].setSendBuff("너 통과");
 		};
 };
 
