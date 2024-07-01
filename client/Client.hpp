@@ -23,7 +23,6 @@ class Client
 		string username;
 		string realname;
 		bool is_passed;
-		bool is_registered;
 		static map<string, int>	nick_map;
 		map<string, Channel> channel_map;
 	public:
@@ -43,8 +42,7 @@ class Client
 		void setSendBuff(const string& data);
 		void setSendBuff(const Reply& data);
 		void clearSendBuff();
-		void setIsRegisteredTrue();
-		bool getIsRegistered();
+		bool getIsRegistered(); // set으ㄹ 빼버리고... 
 		void setIsPassedTrue();
 		bool getIsPassed();
 

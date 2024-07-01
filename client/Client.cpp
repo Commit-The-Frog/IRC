@@ -2,8 +2,9 @@
 
 map<string, int> Client::nick_map;
 
-Client::Client() {}
-Client::Client(int client_fd) : client_fd(client_fd) {}
+Client::Client() : is_passed(false) {
+}
+Client::Client(int client_fd) : client_fd(client_fd), is_passed(false) {}
 Client::~Client() {
 	nick_map.erase(this->nickname);
 }
@@ -67,12 +68,8 @@ void Client::setSendBuff(const Reply& data) {
 	this->send_buff.append(data.getString());
 }
 
-void Client::setIsRegisteredTrue() {
-	this->is_registered = true;
-}
-
 bool Client::getIsRegistered() {
-	return this->is_registered;
+	return (is_passed && this->username.length() != 0 && this->nickname.length() != 0);
 }
 
 void Client::setIsPassedTrue() {
