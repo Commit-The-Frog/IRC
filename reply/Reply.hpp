@@ -16,7 +16,9 @@ class Reply {
 			_code(code), _client_nick(client_nick), _msg(msg) {};
 		string getString(void) const {
 			stringstream ss;
-			ss <<
+			string tempnick = _client_nick == "" ? "*" : _client_nick;
+			ss << ":ircserv" << " " << _code << " " << _client_nick << " " << _msg;
+			return ss.str(); 
 		}
 };
 
