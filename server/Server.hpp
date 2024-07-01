@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/event.h>
+#include <arpa/inet.h>
 #include <vector>
 #include <map>
 #include <fcntl.h>

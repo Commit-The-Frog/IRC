@@ -3,9 +3,11 @@
 map<string, int> Client::nick_map;
 
 Client::Client() {}
-Client::Client(int client_fd) : client_fd(client_fd) {}
+Client::Client(int client_fd, const string& ip_addr) : client_fd(client_fd), ip_addr(ip_addr) {}
 Client::~Client() {
 	nick_map.erase(this->nickname);
+	//channel map에 대한 나가기도 필요함.
+	cout << this->client_fd << ": " << this->ip_addr << " disconnected" << endl;
 }
 
 void Client::addRecvBuff(const string& data) {
