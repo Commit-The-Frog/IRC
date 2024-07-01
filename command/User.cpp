@@ -29,6 +29,18 @@ void User::execute(const Parser &parser, int client_fd)
 			curr_client.setUsername(params[0]);
 			curr_client.setRealname(params[3]);
 			cout << "set client username " << curr_client.getUsername() << endl;
+			if (curr_client.getNickname().length() > 0 && curr_client.getIsPassed()) {
+				// 초기 설정이 완료된 경우
+				curr_client.setSendBuff(Reply("001", curr_client.getNickname(), \
+					":Welcome to the FT_IRC Network, " + curr_client.getNickname()));
+				curr_client.setSendBuff(Reply("002", curr_client.getNickname(), \
+					":Your host is irc.example.com, running version ircd-1.0"));
+				curr_client.setSendBuff(Reply("003", curr_client.getNickname(), \
+					":This server was created Sun Jan 1 2023 at 00:00:00 GMT"));
+				curr_client.setSendBuff(Reply("004", curr_client.getNickname(), \
+					"irc.example.com ircd-1.0  itkol"));
+				cout << "connection established" << endl;
+			}
 		}
 		// 이 외에는 아무 동작도 하지 않음
 }
