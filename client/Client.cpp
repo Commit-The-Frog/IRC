@@ -67,6 +67,22 @@ void Client::setSendBuff(const Reply& data) {
 	this->send_buff.append(data.getString());
 }
 
+void Client::setIsRegisteredTrue() {
+	this->is_registered = true;
+}
+
+bool Client::getIsRegistered() {
+	return this->is_registered;
+}
+
+void Client::setIsPassedTrue() {
+	this->is_passed = true;
+}
+
+bool Client::getIsPassed () {
+	return this->is_passed;
+}
+
 int	Client::getSockFdByNick(const string& nick) {
 	map<string, int>::iterator it = nick_map.find(nick);
 	if (it == nick_map.end())

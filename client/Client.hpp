@@ -22,6 +22,8 @@ class Client
 		string nickname;
 		string username;
 		string realname;
+		bool is_passed;
+		bool is_registered;
 		static map<string, int>	nick_map;
 		map<string, Channel> channel_map;
 	public:
@@ -41,6 +43,10 @@ class Client
 		void setSendBuff(const string& data);
 		void setSendBuff(const Reply& data);
 		void clearSendBuff();
+		void setIsRegisteredTrue();
+		bool getIsRegistered();
+		void setIsPassedTrue();
+		bool getIsPassed();
 
 		static int getSockFdByNick(const string& nick);
 
