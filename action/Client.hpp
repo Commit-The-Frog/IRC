@@ -47,6 +47,12 @@ class Client
 					return ("Same User Nickname");
 				}
 		};
+		class NoSuchNickException: public exception {
+			public:
+				virtual const char* what() const throw() {
+					return ("No Such Nickname");
+				}
+		};
 };
 
 #endif
