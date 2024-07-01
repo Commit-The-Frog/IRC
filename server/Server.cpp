@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_list,channel_list, pwd) {
+Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_map,channel_map, pwd) {
 	this->serv_sock_fd = socket(PF_INET, SOCK_STREAM, 0);
 	memset(&this->serv_addr, 0, sizeof(this->serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -9,7 +9,8 @@ Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(cli
 }
 
 Server::~Server() {
-	client_list.clear();
+	client_map.clear();
+	channel_map.clear();
 }
 
 /*	[serverSocketBind]
@@ -90,16 +91,16 @@ void	Server::run() {
 		change_list.clear();
 		for (int i = 0; i < event_cnt; i++) {
 			curr_event = &event_list[i];
-			it = client_list.find(curr_event->ident);
+			it = client_map.find(curr_event->ident);
 			if (curr_event->filter == EVFILT_READ) {
 				if (static_cast<int>(curr_event->ident) == serv_sock_fd) {
 					registerClient(change_list);
 				} else {
-					if (it != client_list.end())
+					if (it != client_map.end())
 						recvEventFromClient(curr_event, it->second);
 				}
 			} else if (curr_event->filter == EVFILT_WRITE) { 
-				if (it != client_list.end())
+				if (it != client_map.end())
 					sendEventToClient(curr_event, it->second);
 			}
 		}
@@ -121,7 +122,7 @@ void	Server::registerClient(std::vector<struct kevent>& change_list) {
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	changeEvents(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
 	changeEvents(change_list, client_fd, EVFILT_WRITE, EV_ADD | EV_ENABLE);
-	client_list[client_fd] = Client(client_fd);
+	client_map[client_fd] = Client(client_fd);
 	cout << client_fd << " Connect in" << endl;
 }
 
@@ -138,7 +139,7 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes <= 0) {
-		disconnectClient(curr_event->ident, client_list);
+		disconnectClient(curr_event->ident, client_map);
 	} else {
 		buffer[bytes] = '\0';
 		client.addRecvBuff(buffer);
@@ -168,14 +169,14 @@ void	Server::sendEventToClient(struct kevent *curr_event, Client &client) {
 		int bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(),0);
 		if (bytes < 0)
 		{
-			disconnectClient(curr_event->ident, client_list);
+			disconnectClient(curr_event->ident, client_map);
 		}
 		else
 			client.clearSendBuff();
 	}
 }
 
-void	Server::disconnectClient(int client_fd, map<int, Client>&client_list) {
+void	Server::disconnectClient(int client_fd, map<int, Client>&client_map) {
 	close(client_fd);
-	client_list.erase(client_fd);
+	client_map.erase(client_fd);
 }
