@@ -23,13 +23,15 @@ class Nick: public Command
 
 			ss >> nick;
 			if (nick.length() == 0) {
-				client.setSendBuff(cur_nick + " :No nickname given\r\n");
+				client.setSendBuff(Reply("431", client.getNickname(), " :No nickname given"));
+				// client.setSendBuff(cur_nick + " :No nickname given\r\n");
 			} else {
 				try {
 					client.setNickname(nick);
 					// client.setSendBuff("You're now known as " + nick + "\r\n");
 				} catch (Client::AlreadyInUseNickException& e) {
-					client.setSendBuff("<client> " + cur_nick + " :Nickname is already in use\r\n");
+					client.setSendBuff(Reply("433", client.getNickname(), nick + " :Nickname is already in use"));
+					// client.setSendBuff("<client> " + cur_nick + " :Nickname is already in use\r\n");
 				} catch (Client::SameNickException& e) {}
 			}
 		}
