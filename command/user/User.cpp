@@ -1,9 +1,4 @@
 #include "User.hpp"
-
-User::User(std::map<int, Client> &client_map): Command(client_map)
-{
-}
-
 const char *User::ClientNotFoundException::what() const throw() {
 	return ("Client is Not Found!");
 }
