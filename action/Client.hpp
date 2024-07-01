@@ -16,6 +16,7 @@ class Client
 		string recv_buff;
 		string nickname;
 		string username;
+		string realname;
 		static map<string, int>	nick_map;
 		// map<Channel> channel_list;
 	public:
@@ -26,6 +27,8 @@ class Client
 		string getNickname();
 		void setUsername(const string&);
 		string getUsername();
+		void setRealname(const string&);
+		string getRealname();
 		void addRecvBuff(const string& data);
 		void setRecvBuff(const string& data);
 		string getRecvBuff() const;

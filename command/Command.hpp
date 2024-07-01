@@ -1,10 +1,10 @@
 #ifndef COMMAND_HPP_
 #define COMMAND_HPP_
 
-#include "../action/Client.hpp";
 #include "../channel/Channel.hpp"
 #include "../parser/Parser.hpp"
 #include <map>
+#include "../action/Client.hpp"
 using namespace std;
 
 enum {

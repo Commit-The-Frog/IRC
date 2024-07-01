@@ -51,6 +51,14 @@ string Client::getUsername() {
 	return username;
 }
 
+void Client::setRealname(const string& realname) {
+	this->realname = realname;
+}
+
+string Client::getRealname() {
+	return realname;
+}
+
 void Client::setSendBuff(const string& data) {
 	this->send_buff.append(data);
 }

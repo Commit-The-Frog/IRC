@@ -26,6 +26,7 @@ class Server {
 		int						serv_sock_fd;
 		int						kq;
 		std::map<int, Client>	client_list;
+		std::map<int, Channel>	channel_list;
 		CommandFactory			commandFactory;
 
 		Server();
