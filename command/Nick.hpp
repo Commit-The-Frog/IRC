@@ -16,16 +16,15 @@ class Nick: public Command
 		Nick(map<int, Client>& client_map, map<string, Channel>& channel_map)
 		:Command(client_map, channel_map) {};
 		virtual void execute(const Parser& parser, int client_fd) {
-			stringstream	ss(parser.getParams());
+			vector<string>	params = parser.getParams();
 			string			nick;
 			Client&			client = this->client_map[client_fd];
-			string	cur_nick = client.getNickname().length() == 0 ? "*" : client.getNickname();
 
-			ss >> nick;
-			if (nick.length() == 0) {
-				client.setSendBuff(Reply("431", client.getNickname(), " :No nickname given"));
+			if (params.size() == 0) {
+				client.setSendBuff(Reply("431", client.getNickname(), ":No nickname given"));
 				// client.setSendBuff(cur_nick + " :No nickname given\r\n");
 			} else {
+				nick = params[0];
 				try {
 					client.setNickname(nick);
 					// client.setSendBuff("You're now known as " + nick + "\r\n");
