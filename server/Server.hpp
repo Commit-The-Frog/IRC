@@ -27,8 +27,8 @@ class Server {
 		struct sockaddr_in		serv_addr;
 		int						serv_sock_fd;
 		int						kq;
-		map<int, Client>		client_list;
-		map<string, Channel>	channel_list;
+		map<int, Client>		client_map;
+		map<string, Channel>	channel_map;
 		CommandFactory			commandFactory;
 
 		Server();
@@ -43,7 +43,7 @@ class Server {
 		void	registerClient(std::vector<struct kevent>& change_list);
 		void	recvEventFromClient(struct kevent *curr_event, Client& client);
 		void	sendEventToClient(struct kevent *curr_event, Client& client);
-		void	disconnectClient(int client_fd, map<int, Client>& client_list);
+		void	disconnectClient(int client_fd, map<int, Client>& client_map);
 		void	changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags);
 
 		class ServerSocketBindException : public exception {

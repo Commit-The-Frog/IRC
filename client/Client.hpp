@@ -23,7 +23,7 @@ class Client
 		string username;
 		string realname;
 		static map<string, int>	nick_map;
-		map<string, Channel> channel_list;
+		map<string, Channel> channel_map;
 	public:
 		Client();
 		Client(int client_fd);
