@@ -1,8 +1,12 @@
 #include "Client.hpp"
 
+set<string> Client::nick_set;
+
 Client::Client() {}
 Client::Client(int client_fd) : client_fd(client_fd) {}
-Client::~Client() {}
+Client::~Client() {
+	nick_set.erase(this->nickname);
+}
 
 void Client::addRecvBuff(const string& data) {
 	recv_buff.append(data);
@@ -24,8 +28,15 @@ void Client::clearSendBuff() {
 	send_buff.clear();
 }
 
-void Client::setNickname(const string& nickname) {
-	this->nickname = nickname;
+void Client::setNickname(const string& new_nick) {
+	if (new_nick.compare(this->nickname) == 0)
+		throw Client::SameNickException();
+	if (nick_set.find(new_nick) != nick_set.end())
+		throw Client::AlreadyInUseNickException();
+	if (this->nickname.length() > 0)
+		nick_set.erase(this->nickname);
+	this->nickname = new_nick;
+	nick_set.insert(new_nick);
 }
 
 string Client::getNickname() {
@@ -43,3 +54,4 @@ string Client::getUsername() {
 void Client::setSendBuff(const string& data) {
 	this->send_buff.append(data);
 }
+
