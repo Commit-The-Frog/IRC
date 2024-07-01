@@ -5,78 +5,59 @@ User::User(std::map<int, Client> &client_map): Command(client_map)
 }
 
 const char *User::ClientNotFoundException::what() const throw() {
-    return ("Client is Not Found!");
+	return ("Client is Not Found!");
 }
 
 std::vector<string> User::parseParams(const string &params) {
-    std::vector<string> result;
-    string current;
-    bool stop = false;
-    for (int i = 0; i < params.size(); i++) {
-        if ( params[i] == ':' ) {
-            stop = true;
-        }
-        if (!stop && params[i] == ' ') {
-            if (!current.empty()) {
-                result.push_back(current);
-                current.clear();
-            } 
-        }else {
-                current += params[i];
-        }
-    }
-    if (!current.empty())
-        result.push_back(current);
-
-    for (int i = 0; i < result.size(); i++)
-    {
-        cout <<"result " << result[i] << endl;
-    }
-    return result;
+	// parameter 파싱
+	std::vector<string> result;
+	string current;
+	bool stop = false;
+	for (int i = 0; i < params.size(); i++) {
+		if ( params[i] == ':' ) {
+			// :를 만나면 그 뒤로부터는 split하지 않음.
+			stop = true;
+		}
+		if (!stop && params[i] == ' ') {
+			if (!current.empty()) {
+				result.push_back(current);
+				current.clear();
+			} 
+		}else {
+				current += params[i];
+		}
+	}
+	if (!current.empty())
+		result.push_back(current);
+	return result;
 }
 
-void User::execute(const Parser &parser, int fd)
+void User::execute(const Parser &parser, int client_fd)
 {
-    std::map<int, Client>::iterator iter = client_map.find(fd);
-
-    //if (iter != client_list.end()) {
-        std::vector<string> params = parseParams(parser.getParams());
-        Client &curr_client  = client_map[fd];
-        cout << "name" << client_map[fd].getUsername() << endl;
-        for (int i = 0; i < params.size(); i++)
-        {
-            cout << params[i] << endl;
-        }
-
-        if (params.size() < 4 || params[0] == "") {
-            std::stringstream ss;
-            ss << curr_client.getNickname() << " " << "461" << " :Not enough parameters";
-            curr_client.setSendBuff(" :Not enough parameters");
-            cout << " :Not enough parameters" <<endl;
-            return ;
-            // 461에러   "<client> <command> :Not enough parameters";
-        }
-        if (curr_client.getUsername() == ""){
-            cout << "set client username" << endl;
-            curr_client.setUsername(params[0]);
-            curr_client.setRealname(params[3]);
-            cout << "client username " << curr_client.getUsername();
-        } else {
-            cout << " :You may not register" << endl;
-            std::stringstream ss;
-            ss << curr_client.getNickname() << " " << "462" << " :You may not register";
-            client_map[fd].setSendBuff(ss.str());
-            //  "<client> :You may not reregister (462) 에러"
-        }
-        //1. 현재 client가 이름을 가지고 있는지 확인
-        //2. 가지고 있다면 에러 응답.
-        //3. 가지고 있지 않다면 가지고 setName해주기
-        //4. 두번째 params와 세번째 params 무시.
-        //5. 네번째 params는 realname
-        //6. 다섯번째 params 무시
-    //}else {
-     //   throw User::ClientNotFoundException();
-        // 이건 진짜 에러이므로 throw 처리해야함.
-   // }
-    // parser에서 params 4개를 받아와야함!
+		std::map<int, Client>::iterator it = client_map.find(client_fd);
+		if (it == client_map.end()) {
+			// client fd를 찾지 못한 경우
+			throw User::ClientNotFoundException();
+		}
+		std::vector<string> params = parseParams(parser.getParams());
+		Client &curr_client  = client_map[client_fd];
+		if (curr_client.getUsername() != "" && curr_client.getNickname() != ""){
+			// irc 서버에 이미 등록된 경우 (username과 nickname이 있는 경우)
+			std::stringstream ss;
+			ss << ":localhost "  << "462 " << curr_client.getNickname() << " :You may not register \r\n";
+			curr_client.setSendBuff(ss.str());
+		}
+		else if (curr_client.getUsername() == "" && (params.size() < 4 || params[0] == "")) {
+			// username이 없고,  params의 숫자가 4보다 작은 경우.
+			std::stringstream ss;
+			ss << ":localhost " << "461" << " *" << " USER" << " :Not enough parameters \r\n";
+			curr_client.setSendBuff(ss.str());
+		}
+		else if (curr_client.getUsername() == "") {
+			// 정상적으로 등록할 수 있는 경우 (응답 없음)
+			curr_client.setUsername(params[0]);
+			curr_client.setRealname(params[3]);
+			cout << "set client username " << curr_client.getUsername() << endl;
+		}
+		// 이 외에는 아무 동작도 하지 않음
 }

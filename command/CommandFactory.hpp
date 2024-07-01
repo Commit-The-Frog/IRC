@@ -40,10 +40,9 @@ class CommandFactory
 			string cmd = parser.getCmd();
 			int cmd_type;
 			
-			std::cout << "generate "  << cmd << std::endl;
 			if (cmd.compare("PASS") == 0)
 				cmd_type = PASS;
-			else if(cmd == "USER") {
+			else if(cmd.compare("USER") == 0) {
 				cmd_type = USER;}
 			// ...
 			else

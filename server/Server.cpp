@@ -98,7 +98,7 @@ void	Server::run() {
 					if (it != client_list.end())
 						recvEventFromClient(curr_event, it->second);
 				}
-			} else if (curr_event->filter == EVFILT_WRITE) {
+			} else if (curr_event->filter == EVFILT_WRITE) { 
 				if (it != client_list.end())
 					sendEventToClient(curr_event, it->second);
 			}
@@ -142,7 +142,6 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 	} else {
 		buffer[bytes] = '\0';
 		client.addRecvBuff(buffer);
-		// 여기서 파싱을 해야함.
 		while (true) {
 			string client_recv_buff = client.getRecvBuff();
 			if ((clrf_idx = client_recv_buff.find("\r\n")) == string::npos)
