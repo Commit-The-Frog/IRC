@@ -19,11 +19,12 @@ class Pass : public Command
 			- client_fd에 해당하는 사용자의 send_buff에 응답 저장
 		*/
 		void execute(const Parser& parser, int client_fd) {
-			if (parser.getParams()[0] == this->server_pwd)
+			if (parser.getParams()[0] == this->server_pwd) {
+				client_map[client_fd].setIsPassedTrue();
 				cout << "password correct" << endl;
-			else
+				// client_map[client_fd].setSendBuff("너 통과");
+			} else
 				cout << "password incorrect" << endl;
-			client_map[client_fd].setSendBuff("너 통과");
 		};
 };
 

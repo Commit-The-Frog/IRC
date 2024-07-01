@@ -149,6 +149,7 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 			if ((clrf_idx = client_recv_buff.find("\r\n")) == string::npos)
 				break;
 			string substr_data = client_recv_buff.substr(0, clrf_idx);
+			cout << "MSG >>>" << client.getNickname() << " : " << substr_data << endl;
 			client_recv_buff = client_recv_buff.substr(clrf_idx + 2);
 			client.setRecvBuff(client_recv_buff);
 			Parser parsed_data = Parser(substr_data);
