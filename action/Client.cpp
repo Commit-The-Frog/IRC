@@ -43,3 +43,7 @@ string Client::getUsername() {
 void Client::setSendBuff(const string& data) {
 	this->send_buff.append(data);
 }
+
+void Client::setSendBuff(const Reply& data) {
+	this->send_buff.append(data.getString());
+}

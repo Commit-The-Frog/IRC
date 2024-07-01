@@ -4,6 +4,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include "../reply/Reply.hpp"
 using namespace std;
 
 class Client
@@ -28,6 +29,7 @@ class Client
 		string getRecvBuff() const;
 		string getSendBuff() const;
 		void setSendBuff(const string& data);
+		void setSendBuff(const Reply& data);
 		void clearSendBuff();
 };
 
