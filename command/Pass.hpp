@@ -10,10 +10,8 @@ class Pass : public Command
 		const string server_pwd;
 	public:
 		/* client_map, channel_map, server_pwd로 초기화 */
-		// Pass(map<int, Client>& client_map, map<int, Channel>& channel_map, const string& server_pwd)
-		// :Command(client_map, channel_map), server_pwd(server_pwd) {};
-		Pass(map<int, Client>& client_map, const string& server_pwd)
-		:Command(client_map), server_pwd(server_pwd) {};
+		Pass(map<int, Client>& client_map, map<int, Channel>& channel_map, const string& server_pwd)
+		:Command(client_map, channel_map), server_pwd(server_pwd) {};
 		~Pass() {};
 		/* 
 			PASS 명령어 실행 :

@@ -13,8 +13,8 @@ class Nick: public Command
 			ERR_NONICKNAMEGIVEN (431)
 			ERR_NICKNAMEINUSE (433)
 		*/
-		Nick(map<int, Client>& client_map)
-		:Command(client_map) {};
+		Nick(map<int, Client>& client_map, map<int, Channel>& channel_map)
+		:Command(client_map, channel_map) {};
 		virtual void execute(const Parser& parser, int client_fd) {
 			stringstream	ss(parser.getParams());
 			string			nick;
