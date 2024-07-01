@@ -57,8 +57,7 @@ void Client::setSendBuff(const string& data) {
 
 int	Client::getSockFdByNick(const string& nick) {
 	map<string, int>::iterator it = nick_map.find(nick);
-	if (it != nick_map.end())
-		return (it->second);
-	else
-		return (-1);
+	if (it == nick_map.end())
+		throw Client::NoSuchNickException();
+	return (it->second);
 }
