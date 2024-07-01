@@ -4,8 +4,10 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include "../reply/Reply.hpp"
 #include <map>
 #include <exception>
+
 using namespace std;
 
 class Client
@@ -18,7 +20,7 @@ class Client
 		string username;
 		string realname;
 		static map<string, int>	nick_map;
-		// map<Channel> channel_list;
+		map<Channel> channel_list;
 	public:
 		Client();
 		Client(int client_fd);
@@ -34,6 +36,7 @@ class Client
 		string getRecvBuff() const;
 		string getSendBuff() const;
 		void setSendBuff(const string& data);
+		void setSendBuff(const Reply& data);
 		void clearSendBuff();
 
 		static int getSockFdByNick(const string& nick);

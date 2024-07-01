@@ -63,6 +63,9 @@ void Client::setSendBuff(const string& data) {
 	this->send_buff.append(data);
 }
 
+void Client::setSendBuff(const Reply& data) {
+	this->send_buff.append(data.getString());
+
 int	Client::getSockFdByNick(const string& nick) {
 	map<string, int>::iterator it = nick_map.find(nick);
 	if (it == nick_map.end())
