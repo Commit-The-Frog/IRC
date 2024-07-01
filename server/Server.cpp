@@ -99,7 +99,7 @@ void	Server::run() {
 					if (it != client_map.end())
 						recvEventFromClient(curr_event, it->second);
 				}
-			} else if (curr_event->filter == EVFILT_WRITE) { 
+			} else if (curr_event->filter == EVFILT_WRITE) {
 				if (it != client_map.end())
 					sendEventToClient(curr_event, it->second);
 			}
@@ -122,8 +122,9 @@ void	Server::registerClient(std::vector<struct kevent>& change_list) {
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	changeEvents(change_list, client_fd, EVFILT_READ, EV_ADD | EV_ENABLE);
 	changeEvents(change_list, client_fd, EVFILT_WRITE, EV_ADD | EV_ENABLE);
-	client_map[client_fd] = Client(client_fd);
-	cout << client_fd << " Connect in" << endl;
+	string sock_addr = string(inet_ntoa(client_addr.sin_addr));
+	client_map[client_fd] = Client(client_fd, sock_addr);
+	cout << client_fd << ": " << sock_addr << " connected" << endl;
 }
 
 /*	[recvEventFromClient]
