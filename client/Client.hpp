@@ -43,7 +43,7 @@ class Client
 		void setSendBuff(const string& data);
 		void setSendBuff(const Reply& data);
 		void clearSendBuff();
-		bool getIsRegistered(); // set으ㄹ 빼버리고... 
+		bool getIsRegistered();
 		void setIsPassedTrue();
 		bool getIsPassed();
 
