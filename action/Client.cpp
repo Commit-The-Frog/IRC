@@ -1,8 +1,12 @@
 #include "Client.hpp"
 
+map<string, int> Client::nick_map;
+
 Client::Client() {}
 Client::Client(int client_fd) : client_fd(client_fd) {}
-Client::~Client() {}
+Client::~Client() {
+	nick_map.erase(this->nickname);
+}
 
 void Client::addRecvBuff(const string& data) {
 	recv_buff.append(data);
@@ -24,8 +28,15 @@ void Client::clearSendBuff() {
 	send_buff.clear();
 }
 
-void Client::setNickname(const string& nickname) {
-	this->nickname = nickname;
+void Client::setNickname(const string& new_nick) {
+	if (new_nick.compare(this->nickname) == 0)
+		throw Client::SameNickException();
+	if (nick_map.find(new_nick) != nick_map.end())
+		throw Client::AlreadyInUseNickException();
+	if (this->nickname.length() > 0)
+		nick_map.erase(this->nickname);
+	this->nickname = new_nick;
+	nick_map[new_nick] = this->client_fd;
 }
 
 string Client::getNickname() {
@@ -42,4 +53,11 @@ string Client::getUsername() {
 
 void Client::setSendBuff(const string& data) {
 	this->send_buff.append(data);
+}
+
+int	Client::getSockFdByNick(const string& nick) {
+	map<string, int>::iterator it = nick_map.find(nick);
+	if (it == nick_map.end())
+		throw Client::NoSuchNickException();
+	return (it->second);
 }

@@ -5,6 +5,7 @@
 // #include "../channel/Channel.hpp"
 #include "Command.hpp"
 #include "Pass.hpp"
+#include "Nick.hpp"
 
 class CommandFactory
 {
@@ -23,6 +24,7 @@ class CommandFactory
 		:client_map(client_map), server_pwd(server_pwd)
 		{
 			cmd_map[PASS] = new Pass(this->client_map, this->server_pwd);
+			cmd_map[NICK] = new Nick(this->client_map);
 		};
 		~CommandFactory() {
 			map<int, Command*>::iterator it;
@@ -37,9 +39,11 @@ class CommandFactory
 		Command* generateCommand(const Parser& parser) const {
 			string cmd = parser.getCmd();
 			int cmd_type;
-			
+
 			if (cmd.compare("PASS") == 0)
 				cmd_type = PASS;
+			else if (cmd.compare("NICK") == 0)
+				cmd_type = NICK;
 			// ...
 			else
 				throw invalid_argument("COMMAND NOT FOUND");

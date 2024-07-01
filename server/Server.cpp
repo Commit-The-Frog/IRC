@@ -137,7 +137,7 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 	Command			*cmd;
 
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
-	if (bytes < 0) {
+	if (bytes <= 0) {
 		disconnectClient(curr_event->ident, client_list);
 	} else {
 		buffer[bytes] = '\0';

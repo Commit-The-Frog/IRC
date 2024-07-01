@@ -4,6 +4,8 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include <map>
+#include <exception>
 using namespace std;
 
 class Client
@@ -14,6 +16,7 @@ class Client
 		string recv_buff;
 		string nickname;
 		string username;
+		static map<string, int>	nick_map;
 		// map<Channel> channel_list;
 	public:
 		Client();
@@ -29,6 +32,27 @@ class Client
 		string getSendBuff() const;
 		void setSendBuff(const string& data);
 		void clearSendBuff();
+
+		static int getSockFdByNick(const string& nick);
+
+		class AlreadyInUseNickException: public exception {
+			public:
+				virtual const char* what() const throw() {
+					return ("Duplicated User Nickname");
+				}
+		};
+		class SameNickException: public exception {
+			public:
+				virtual const char* what() const throw() {
+					return ("Same User Nickname");
+				}
+		};
+		class NoSuchNickException: public exception {
+			public:
+				virtual const char* what() const throw() {
+					return ("No Such Nickname");
+				}
+		};
 };
 
 #endif
