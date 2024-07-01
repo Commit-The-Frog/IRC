@@ -1,7 +1,7 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 #include <map>
-#include "../action/Client.hpp"
+#include "../client/Client.hpp"
 
 enum {
 	MODE_I,
@@ -10,6 +10,8 @@ enum {
 	MODE_O,
 	MODE_L
 };
+
+class Client;
 
 class Channel
 {

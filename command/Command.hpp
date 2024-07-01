@@ -4,7 +4,7 @@
 #include "../channel/Channel.hpp"
 #include "../parser/Parser.hpp"
 #include <map>
-#include "../action/Client.hpp"
+#include "../client/Client.hpp"
 using namespace std;
 
 enum {
@@ -18,10 +18,10 @@ class Command
 {
 	protected:
 		map<int, Client>& client_map;
-		map<int, Channel>& channel_map;
+		map<string, Channel>& channel_map;
 	public:
 		Command();
-		Command(map<int, Client>& client_map, map<int, Channel>& channel_map)
+		Command(map<int, Client>& client_map, map<string, Channel>& channel_map)
 		:client_map(client_map), channel_map(channel_map) {};
 		virtual void execute(const Parser&, int) = 0;
 		virtual ~Command() {};

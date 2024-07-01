@@ -1,7 +1,7 @@
 #ifndef COMMAND_FACTORY_HPP_
 #define COMMAND_FACTORY_HPP_
 
-#include "../action/Client.hpp"
+#include "../client/Client.hpp"
 #include "../channel/Channel.hpp"
 #include "Command.hpp"
 #include "Pass.hpp"
@@ -12,11 +12,11 @@ class CommandFactory
 {
 	private:
 		map<int, Client>& client_map;
-		map<int, Channel>& channel_map;
+		map<string, Channel>& channel_map;
 		string server_pwd;
 		map<int, Command*> cmd_map;
 	public:
-		 CommandFactory(map<int, Client>& client_map, map<int, Channel>& channel_map, const string& server_pwd)
+		 CommandFactory(map<int, Client>& client_map, map<string, Channel>& channel_map, const string& server_pwd)
 		 :client_map(client_map), channel_map(channel_map), server_pwd(server_pwd)
 		{
 			cmd_map[PASS] = new Pass(this->client_map, this->channel_map, this->server_pwd);

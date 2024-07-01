@@ -3,7 +3,7 @@
 
 # include "Command.hpp"
 # include "../parser/Parser.hpp"
-# include "../action/Client.hpp"
+# include "../client/Client.hpp"
 # include <sstream>
 
 class Nick: public Command
@@ -13,7 +13,7 @@ class Nick: public Command
 			ERR_NONICKNAMEGIVEN (431)
 			ERR_NICKNAMEINUSE (433)
 		*/
-		Nick(map<int, Client>& client_map, map<int, Channel>& channel_map)
+		Nick(map<int, Client>& client_map, map<string, Channel>& channel_map)
 		:Command(client_map, channel_map) {};
 		virtual void execute(const Parser& parser, int client_fd) {
 			stringstream	ss(parser.getParams());
