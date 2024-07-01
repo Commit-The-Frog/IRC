@@ -19,16 +19,17 @@ class Nick: public Command
 			stringstream	ss(parser.getParams());
 			string			nick;
 			Client&			client = this->client_map[client_fd];
+			string	cur_nick = client.getNickname().length() == 0 ? "*" : client.getNickname();
 
 			ss >> nick;
 			if (nick.length() == 0) {
-				client.setSendBuff("<client> :No nickname given\r\n");
+				client.setSendBuff(cur_nick + " :No nickname given\r\n");
 			} else {
 				try {
 					client.setNickname(nick);
-					client.setSendBuff("You're now known as " + nick + "\r\n");
+					// client.setSendBuff("You're now known as " + nick + "\r\n");
 				} catch (Client::AlreadyInUseNickException& e) {
-					client.setSendBuff("<client> <nick> :Nickname is already in use\r\n");
+					client.setSendBuff("<client> " + cur_nick + " :Nickname is already in use\r\n");
 				} catch (Client::SameNickException& e) {}
 			}
 		}
