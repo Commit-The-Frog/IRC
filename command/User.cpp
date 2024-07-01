@@ -3,31 +3,6 @@ const char *User::ClientNotFoundException::what() const throw() {
 	return ("Client is Not Found!");
 }
 
-// std::vector<string> User::parseParams(const string &params) {
-// 	// parameter 파싱
-// 	std::vector<string> result;
-// 	string current;
-// 	bool stop = false;
-// 	for (int i = 0; i < params.size(); i++) {
-// 		if ( params[i] == ':' ) {
-// 			// :를 만나면 그 뒤로부터는 split하지 않음.
-// 			stop = true;
-// 			continue;
-// 		}
-// 		if (!stop && params[i] == ' ') {
-// 			if (!current.empty()) {
-// 				result.push_back(current);
-// 				current.clear();
-// 			}
-// 		}else {
-// 				current += params[i];
-// 		}
-// 	}
-// 	if (!current.empty())
-// 		result.push_back(current);
-// 	return result;
-// }
-
 void User::execute(const Parser &parser, int client_fd)
 {
 		std::map<int, Client>::iterator it = client_map.find(client_fd);
