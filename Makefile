@@ -3,7 +3,7 @@ CPP = c++
 CPPFLAGS = -MMD -MP -std=c++98
 SRC = main.cpp \
 	server/Server.cpp \
-	action/Client.cpp \
+	client/Client.cpp \
 	parser/Parser.cpp \
 	channel/Channel.cpp \
 	command/User.cpp \
@@ -26,7 +26,7 @@ fclean:
 	make clean
 	rm -rf $(NAME)
 
-re: 
+re:
 	make fclean
 	make all
 

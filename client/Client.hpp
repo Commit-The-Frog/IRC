@@ -5,10 +5,13 @@
 #include <stdexcept>
 #include <iostream>
 #include "../reply/Reply.hpp"
+#include "../channel/Channel.hpp"
 #include <map>
 #include <exception>
 
 using namespace std;
+
+class Channel;
 
 class Client
 {
@@ -20,7 +23,7 @@ class Client
 		string username;
 		string realname;
 		static map<string, int>	nick_map;
-		map<Channel> channel_list;
+		map<string, Channel> channel_list;
 	public:
 		Client();
 		Client(int client_fd);

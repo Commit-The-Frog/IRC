@@ -10,13 +10,15 @@
 #include <map>
 #include <fcntl.h>
 #include <unistd.h>
-#include "../action/Client.hpp"
+#include "../client/Client.hpp"
 #include "../command/Pass.hpp"
 #include "../command/Command.hpp"
 #include "../parser/Parser.hpp"
 #include "../command/CommandFactory.hpp"
 
 using namespace std;
+
+class Channel;
 
 class Server {
 	private:
@@ -25,8 +27,8 @@ class Server {
 		struct sockaddr_in		serv_addr;
 		int						serv_sock_fd;
 		int						kq;
-		std::map<int, Client>	client_list;
-		std::map<int, Channel>	channel_list;
+		map<int, Client>		client_list;
+		map<string, Channel>	channel_list;
 		CommandFactory			commandFactory;
 
 		Server();
