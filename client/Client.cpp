@@ -3,7 +3,7 @@
 map<string, int> Client::nick_map;
 
 Client::Client() {}
-Client::Client(int client_fd, const string& ip_addr) : client_fd(client_fd), ip_addr(ip_addr) {}
+Client::Client(int client_fd, const string& ip_addr) : client_fd(client_fd), ip_addr(ip_addr), is_passed(false) {}
 Client::~Client() {
 	nick_map.erase(this->nickname);
 	//channel map에 대한 나가기도 필요함.
@@ -67,6 +67,18 @@ void Client::setSendBuff(const string& data) {
 
 void Client::setSendBuff(const Reply& data) {
 	this->send_buff.append(data.getString());
+}
+
+bool Client::getIsRegistered() {
+	return (is_passed && this->username.length() != 0 && this->nickname.length() != 0);
+}
+
+void Client::setIsPassedTrue() {
+	this->is_passed = true;
+}
+
+bool Client::getIsPassed () {
+	return this->is_passed;
 }
 
 int	Client::getSockFdByNick(const string& nick) {
