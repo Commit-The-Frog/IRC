@@ -19,7 +19,7 @@ class Command
 		map<int, Client>& client_map;
 		// map<int, Channel>& channel_map;
 	public:
-		//Command(){};
+		Command();
 		// Command(map<int, Client>& client_map, map<int, Channel>& channel_map)
 		// :client_map(client_map), channel_map(channel_map) {};
 		Command(map<int, Client>& client_map)
