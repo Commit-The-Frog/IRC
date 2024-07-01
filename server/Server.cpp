@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_list, pwd) {
+Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_list,channel_list, pwd) {
 	this->serv_sock_fd = socket(PF_INET, SOCK_STREAM, 0);
 	memset(&this->serv_addr, 0, sizeof(this->serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -98,7 +98,7 @@ void	Server::run() {
 					if (it != client_list.end())
 						recvEventFromClient(curr_event, it->second);
 				}
-			} else if (curr_event->filter == EVFILT_WRITE) {
+			} else if (curr_event->filter == EVFILT_WRITE) { 
 				if (it != client_list.end())
 					sendEventToClient(curr_event, it->second);
 			}
@@ -137,12 +137,11 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 	Command			*cmd;
 
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
-	if (bytes < 0) {
+	if (bytes <= 0) {
 		disconnectClient(curr_event->ident, client_list);
 	} else {
 		buffer[bytes] = '\0';
 		client.addRecvBuff(buffer);
-		// 여기서 파싱을 해야함.
 		while (true) {
 			string client_recv_buff = client.getRecvBuff();
 			if ((clrf_idx = client_recv_buff.find("\r\n")) == string::npos)

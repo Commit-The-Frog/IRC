@@ -5,7 +5,8 @@ SRC = main.cpp \
 	server/Server.cpp \
 	action/Client.cpp \
 	parser/Parser.cpp \
-	channel/Channel.cpp
+	channel/Channel.cpp \
+	command/User.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
