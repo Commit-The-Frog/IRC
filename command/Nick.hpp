@@ -22,15 +22,16 @@ class Nick: public Command
 
 			if (params.size() == 0) {
 				client.setSendBuff(Reply("431", client.getNickname(), ":No nickname given"));
-				// client.setSendBuff(cur_nick + " :No nickname given\r\n");
 			} else {
 				nick = params[0];
 				try {
+					if (nick.find(' ') != string::npos || nick[0] == '&' || nick[0] == '#') {
+						client.setSendBuff(Reply("432", client.getNickname(), nick + " :Erroneus nickname"));
+						return ;
+					}
 					client.setNickname(nick);
-					// client.setSendBuff("You're now known as " + nick + "\r\n");
 				} catch (Client::AlreadyInUseNickException& e) {
 					client.setSendBuff(Reply("433", client.getNickname(), nick + " :Nickname is already in use"));
-					// client.setSendBuff("<client> " + cur_nick + " :Nickname is already in use\r\n");
 				} catch (Client::SameNickException& e) {}
 			}
 		}
