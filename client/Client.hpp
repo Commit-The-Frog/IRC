@@ -23,11 +23,12 @@ class Client
 		string username;
 		string realname;
 		bool is_passed;
-		static map<string, int>	nick_map;
+		string ip_addr;
 		map<string, Channel> channel_map;
+		static map<string, int>	nick_map;
 	public:
 		Client();
-		Client(int client_fd);
+		Client(int client_fd, const string& ip_addr);
 		~Client();
 		void setNickname(const string&);
 		string getNickname();
