@@ -14,6 +14,8 @@ class Privmsg : public Command
 		*/
 		void execute(const Parser& parser, int client_fd) {
 			vector<string> params = parser.getParams();
+			string target;
+			Client& client = client_map[client_fd];
 		}
 };
 
