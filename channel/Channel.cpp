@@ -37,12 +37,14 @@ void Channel::deleteOperator(const string &nick) {
 	operator_map.erase(nick);
 }
 
-void Channel::addMember(const string &nick, const Client &client) {
+void Channel::addMember(const string &nick, Client &client) {
 	member_map[nick] = client;
+	client.addChannel(this->channel_name, *this);
 }
 
-void Channel::deleteMember(const string &nick) {
+void Channel::deleteMember(const string &nick, Client &client) {
 	member_map.erase(nick);
+	client.deleteChannel(channel_name);
 }
 
 void Channel::addInvite(const string &nick, const Client &client) {
