@@ -32,7 +32,6 @@ class Nick: public Command
 						return ;
 					}
 					if (!client.getIsRegistered()) {
-						// 초기 설정이 완료된 경우
 						client.setNickname(nick);
 						if (client.getIsRegistered()) {
 							client.setSendBuff(Reply::getCodeMsg("001", client.getNickname(), \
