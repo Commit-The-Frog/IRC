@@ -23,6 +23,7 @@ class Channel
 		std::map<string, Client> inivite_map;
 		string key;
 		string topic;
+		int limit;
 		bool options[5];
 	public:
 		Channel() {};
@@ -42,6 +43,8 @@ class Channel
 		const string &getKey() const;
 		void setTopic(string str);
 		const string &getTopic() const;
+		void setLimit(int limit);
+		int getLimit() const;
 		bool getModeOptionI() const;
 		bool getModeOptionT() const;
 		bool getModeOptionK() const;
@@ -52,6 +55,7 @@ class Channel
 		void setModeOptionK(bool flag);
 		void setModeOptionO(bool flag);
 		void setModeOptionL(bool flag);
+		void sendAllClients(string const &msg);
 };
 
 #endif
