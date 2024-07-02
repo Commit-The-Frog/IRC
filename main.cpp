@@ -1,4 +1,4 @@
-#include "server/Server.hpp"
+#include "./server/Server.hpp"
 #include <exception>
 
 using namespace std;

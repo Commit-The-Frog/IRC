@@ -1,4 +1,4 @@
-NAME = Ircserv
+NAME = ircserv
 CPP = c++
 CPPFLAGS = -MMD -MP -std=c++98
 SRC = main.cpp \

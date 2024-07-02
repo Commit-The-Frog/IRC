@@ -3,9 +3,10 @@
 
 #include "Command.hpp"
 #include "../parser/Parser.hpp"
+#include "../reply/Reply.hpp"
+#include "../client/Client.hpp"
 
-class Pass : public Command
-{
+class Pass : public Command {
 	private:
 		const string server_pwd;
 	public:
@@ -19,12 +20,17 @@ class Pass : public Command
 			- client_fd에 해당하는 사용자의 send_buff에 응답 저장
 		*/
 		void execute(const Parser& parser, int client_fd) {
-			if (parser.getParams()[0] == this->server_pwd) {
+			Client &curr_client = client_map[client_fd];
+			if (curr_client.getIsRegistered())
+				curr_client.setSendBuff(Reply("462", curr_client.getNickname(), ":You may not reregister"));
+			else if (parser.getParams().size() == 0) {
+				curr_client.setSendBuff(Reply("461", curr_client.getNickname(), ":Not enough parameters"));
+			}
+			else if (parser.getParams()[0] != this->server_pwd)
+				curr_client.setSendBuff(Reply("464", curr_client.getNickname(), ":Password incorrect"));
+			else if (parser.getParams()[0] == this->server_pwd) {
 				client_map[client_fd].setIsPassedTrue();
-				cout << "password correct" << endl;
-				// client_map[client_fd].setSendBuff("너 통과");
-			} else
-				cout << "password incorrect" << endl;
+			}
 		};
 };
 
