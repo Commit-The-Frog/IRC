@@ -1,18 +1,22 @@
 #include "Join.hpp"
 
-void Join::verificateKey(Channel const &channel) {
+void Join::verificateKey(const Channel &channel, const string &str) {
 	if (channel.getModeOptionK())  {
-
+		if (channel.getKey() == str) {
+			// join
+		} else {
+			throw Join::join
+		}
 	}
 }
 
-void Join::verificateInvite(Channel const &channel) {
+void Join::verificateInvite(const Channel &channel) {
 	if (channel.getModeOptionI()) {
 
 	}
 }
 
-void Join::verificateLimit(Channel const &channel) {
+void Join::verificateLimit(const Channel &channel) {
 	if (channel.getModeOptionL()) {
 
 	}

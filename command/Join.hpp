@@ -13,10 +13,18 @@ class Join : public Command {
 		Join(map<int, Client> &client_map, map<string, Channel> &channel_map) : Command(client_map, channel_map) {};
 		~Join(){};
 	void execute(const Parser &parser, int fd);
-	void verificateKey(Channel const &channel);
-	void verificateInvite(Channel const &channel);
-	void verificateLimit(Channel const &channel);
+	void verificateKey(const Channel &channel);
+	void verificateInvite(const Channel &channel);
+	void verificateLimit(const Channel &channel);
 	class JoinVerficateKeyException : public exception {
+		public :
+			virtual const char* what() const throw();
+	};
+	class JoinVerficateInviteException : public exception {
+		public :
+			virtual const char* what() const throw();
+	};
+	class JoinVerficateInviteException : public exception {
 		public :
 			virtual const char* what() const throw();
 	};
