@@ -30,26 +30,26 @@ const string &Channel::getChannelName() const {
 	return this->channel_name;
 }
 
-void Channel::addOperator(const string &nick, Client *client) {
-	operator_map[nick] = client;
+void Channel::addOperator(const string &nick, Client &client) {
+	operator_map[nick] = &client;
 }
 
 void Channel::deleteOperator(const string &nick) {
 	operator_map.erase(nick);
 }
 
-void Channel::addMember(const string &nick, Client *client) {
-	member_map[nick] = client;
-	client->addChannel(this->channel_name, this);
+void Channel::addMember(const string &nick, Client &client) {
+	member_map[nick] = &client;
+	client.addChannel(this->channel_name, *this);
 }
 
-void Channel::deleteMember(const string &nick, Client *client) {
+void Channel::deleteMember(const string &nick, Client &client) {
 	member_map.erase(nick);
-	client->deleteChannel(channel_name);
+	client.deleteChannel(channel_name);
 }
 
-void Channel::addInvite(const string &nick, Client *client) {
-	inivite_map[nick] = client;
+void Channel::addInvite(const string &nick, Client &client) {
+	inivite_map[nick] = &client;
 }
 
 void Channel::deleteInvite(const string &nick) {

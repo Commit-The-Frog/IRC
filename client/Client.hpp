@@ -45,7 +45,7 @@ class Client
 		bool getIsRegistered() const;
 		void setIsPassedTrue();
 		bool getIsPassed() const;
-		void addChannel(const string &channel_name, Channel *channel);
+		void addChannel(const string &channel_name, Channel &channel);
 		void deleteChannel(const string &channel_name);
 
 		static int getSockFdByNick(const string& nick);
