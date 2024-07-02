@@ -3,6 +3,8 @@
 #include <map>
 #include "../client/Client.hpp"
 
+using namespace std;
+
 enum {
 	MODE_I,
 	MODE_T,
