@@ -31,21 +31,21 @@ class Client
 		Client(int client_fd, const string& ip_addr);
 		~Client();
 		void setNickname(const string&);
-		string getNickname();
+		string getNickname() const;
 		void setUsername(const string&);
-		string getUsername();
+		string getUsername() const;
 		void setRealname(const string&);
-		string getRealname();
+		string getRealname() const;
+		string getIpAddr() const;
 		void addRecvBuff(const string& data);
 		void setRecvBuff(const string& data);
 		string getRecvBuff() const;
 		string getSendBuff() const;
 		void setSendBuff(const string& data);
-		void setSendBuff(const Reply& data);
 		void clearSendBuff();
-		bool getIsRegistered();
+		bool getIsRegistered() const;
 		void setIsPassedTrue();
-		bool getIsPassed();
+		bool getIsPassed() const;
 
 		static int getSockFdByNick(const string& nick);
 
