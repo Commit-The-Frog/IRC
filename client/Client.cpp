@@ -19,7 +19,6 @@ Client::~Client() {
 			curr_channel.deleteMember(this->nickname);
 		}
 	}
-	//channel map에 대한 나가기도 필요함.
 	cout << this->client_fd << ": " << this->ip_addr << " disconnected" << endl;
 }
 
