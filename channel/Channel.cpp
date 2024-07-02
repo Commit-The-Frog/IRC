@@ -73,6 +73,14 @@ const string &Channel::getTopic() const {
 	return topic;
 }
 
+void Channel::setLimit(int limit) {
+	this->limit = limit;
+}
+
+int Channel::getLimit() const {
+	return this->limit;
+}
+
 bool Channel::getModeOptionI() const {
 	return options[MODE_I];
 }
@@ -112,4 +120,10 @@ void Channel::setModeOptionO(bool flag) {
 
 void Channel::setModeOptionL(bool flag) {
 	options[MODE_L] = flag;
+}
+
+void Channel::sendAllClients(string const &msg) {
+	for (std::map<string, Client>::iterator it = member_map.begin(); it != member_map.end(); ++it) {
+		it->second.setSendBuff(msg);
+	}
 }
