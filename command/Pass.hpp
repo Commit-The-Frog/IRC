@@ -22,12 +22,12 @@ class Pass : public Command {
 		void execute(const Parser& parser, int client_fd) {
 			Client &curr_client = client_map[client_fd];
 			if (curr_client.getIsRegistered())
-				curr_client.setSendBuff(Reply("462", curr_client.getNickname(), ":You may not reregister"));
+				curr_client.setSendBuff(Reply::getCodeMsg("462", curr_client.getNickname(), ":You may not reregister"));
 			else if (parser.getParams().size() == 0) {
-				curr_client.setSendBuff(Reply("461", curr_client.getNickname(), ":Not enough parameters"));
+				curr_client.setSendBuff(Reply::getCodeMsg("461", curr_client.getNickname(), ":Not enough parameters"));
 			}
 			else if (parser.getParams()[0] != this->server_pwd)
-				curr_client.setSendBuff(Reply("464", curr_client.getNickname(), ":Password incorrect"));
+				curr_client.setSendBuff(Reply::getCodeMsg("464", curr_client.getNickname(), ":Password incorrect"));
 			else if (parser.getParams()[0] == this->server_pwd) {
 				client_map[client_fd].setIsPassedTrue();
 			}

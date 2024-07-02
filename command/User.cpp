@@ -14,11 +14,11 @@ void User::execute(const Parser &parser, int client_fd)
 		Client &curr_client  = client_map[client_fd];
 		if (curr_client.getUsername() != "" && curr_client.getNickname() != ""){
 			// irc 서버에 이미 등록된 경우 (username과 nickname이 있는 경우)
-			curr_client.setSendBuff(Reply("462", curr_client.getNickname(), ":You may not reregister"));
+			curr_client.setSendBuff(Reply::getCodeMsg("462", curr_client.getNickname(), ":You may not reregister"));
 		}
 		else if (curr_client.getUsername() == "" && (params.size() < 4 || params[0] == "")) {
 			// username이 없고,  params의 숫자가 4보다 작은 경우.
-			curr_client.setSendBuff(Reply("461", curr_client.getNickname(), ":Not enough parameters"));
+			curr_client.setSendBuff(Reply::getCodeMsg("461", curr_client.getNickname(), ":Not enough parameters"));
 		}
 		else if (curr_client.getUsername() == "") {
 			// 정상적으로 등록할 수 있는 경우 (응답 없음)
@@ -27,13 +27,13 @@ void User::execute(const Parser &parser, int client_fd)
 			cout << "set client username " << curr_client.getUsername() << endl;
 			if (curr_client.getNickname().length() > 0 && curr_client.getIsPassed()) {
 				// 초기 설정이 완료된 경우
-				curr_client.setSendBuff(Reply("001", curr_client.getNickname(), \
+				curr_client.setSendBuff(Reply::getCodeMsg("001", curr_client.getNickname(), \
 					":Welcome to the FT_IRC Network, " + curr_client.getNickname()));
-				curr_client.setSendBuff(Reply("002", curr_client.getNickname(), \
+				curr_client.setSendBuff(Reply::getCodeMsg("002", curr_client.getNickname(), \
 					":Your host is irc.example.com, running version ircd-1.0"));
-				curr_client.setSendBuff(Reply("003", curr_client.getNickname(), \
+				curr_client.setSendBuff(Reply::getCodeMsg("003", curr_client.getNickname(), \
 					":This server was created Sun Jan 1 2023 at 00:00:00 GMT"));
-				curr_client.setSendBuff(Reply("004", curr_client.getNickname(), \
+				curr_client.setSendBuff(Reply::getCodeMsg("004", curr_client.getNickname(), \
 					"irc.example.com ircd-1.0  itkol"));
 				cout << "connection established" << endl;
 			}

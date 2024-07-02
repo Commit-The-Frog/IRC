@@ -41,7 +41,7 @@ void Client::setNickname(const string& new_nick) {
 	nick_map[new_nick] = this->client_fd;
 }
 
-string Client::getNickname() {
+string Client::getNickname() const {
 	return nickname;
 }
 
@@ -49,7 +49,7 @@ void Client::setUsername(const string& username) {
 	this->username = username;
 }
 
-string Client::getUsername() {
+string Client::getUsername() const {
 	return username;
 }
 
@@ -57,19 +57,19 @@ void Client::setRealname(const string& realname) {
 	this->realname = realname;
 }
 
-string Client::getRealname() {
+string Client::getRealname() const {
 	return realname;
+}
+
+string Client::getIpAddr() const {
+	return ip_addr;
 }
 
 void Client::setSendBuff(const string& data) {
 	this->send_buff.append(data);
 }
 
-void Client::setSendBuff(const Reply& data) {
-	this->send_buff.append(data.getString());
-}
-
-bool Client::getIsRegistered() {
+bool Client::getIsRegistered() const {
 	return (is_passed && this->username.length() != 0 && this->nickname.length() != 0);
 }
 
@@ -77,7 +77,7 @@ void Client::setIsPassedTrue() {
 	this->is_passed = true;
 }
 
-bool Client::getIsPassed () {
+bool Client::getIsPassed() const {
 	return this->is_passed;
 }
 

@@ -3,21 +3,22 @@
 
 # include <string>
 # include <sstream>
+# include "../client/Client.hpp"
 
 using namespace std;
 
 class Reply {
-	private:
-		string	_code;
-		string	_client_nick;
-		string	_msg;
 	public:
-		Reply(const string& code, const string& client_nick, const string& msg):
-			_code(code), _client_nick(client_nick), _msg(msg) {};
-		string getString(void) const {
+		static string getCodeMsg(const string& code, const string& client_nick, const string& msg) {
 			stringstream ss;
-			string tempnick = _client_nick.length() == 0 ? "*" : _client_nick;
-			ss << ":ircserv" << " " << _code << " " << tempnick << " " << _msg << "\r\n";
+			string tempnick = client_nick.length() == 0 ? "*" : client_nick;
+			ss << ":ircserv" << " " << code << " " << tempnick << " " << msg << "\r\n";
+			return ss.str();
+		}
+		static string getCommonMsg(const Client& client, const string& command, const string& msg) {
+			string prefix = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + client.getIpAddr();
+			stringstream ss;
+			ss << prefix << " " << command << " " << msg << "\r\n";
 			return ss.str();
 		}
 };
