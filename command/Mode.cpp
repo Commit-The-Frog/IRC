@@ -135,43 +135,52 @@ void Mode::execute(const Parser& parser, int client_fd)
 				if (cur_str[0] == '+') {
 					if (!channel.getModeOptionT()) {
 						changed_mode_vec.push_back(*it);
-						channel.setModeOptionI(true);
+						channel.setModeOptionT(true);
 					}
 				} else {
 					if (channel.getModeOptionT()) {
 						changed_mode_vec.push_back(*it);
-						channel.setModeOptionI(false);
+						channel.setModeOptionT(false);
 					}
 				}
 			case 'k':
 				if (cur_str[0] == '+') {
 					if (!channel.getModeOptionK()) {
 						changed_mode_vec.push_back(*it);
-						channel.setModeOptionI(true);
+						channel.setModeOptionK(true);
 						channel.setKey(sub_str);
 					}
 				} else {
 					if (channel.getModeOptionK()) {
 						changed_mode_vec.push_back(*it);
-						channel.setModeOptionI(false);
+						channel.setModeOptionK(false);
 						channel.setKey("");
 					}
 				}
 			case 'o':
+				int client_fd;
+				try {
+					client_fd = Client::getSockFdByNick(sub_str);
+				} catch (Client::NoSuchNickException &e) {
+					// 401 <client> <nick> :No such nick/channel
+				}
 				if (cur_str[0] == '+') {
-						if (!channel.isMember(sub_str))
-							// 채널의 맴버가 아니라는 에러
-						else if (!channel.isOperator(sub_str)) {
-							changed_mode_vec.push_back(*it);
-							// 채널의 관리자로 추가.
-						}
+					Client& target_client = client_map[client_fd];
+					if (!channel.isMember(sub_str)) {
+						// 441 :They aren't on that channel
+					} else if (!channel.isOperator(sub_str)) {
+						changed_mode_vec.push_back(*it);
+						channel.addOperator(sub_str, target_client);
+						// 채널의 관리자로 추가.
+					}
 				} else {
-						if (!channel.isMember(sub_str))
-							// 채널의 맴버가 아니라는 에러
-						else if (channel.isOperator(sub_str)) {
-							changed_mode_vec.push_back(*it);
-							// 채널의 관리자에서 제거.
-						}
+					if (!channel.isMember(sub_str)) {
+						// 441 :They aren't on that channel
+					} else if (channel.isOperator(sub_str)) {
+						changed_mode_vec.push_back(*it);
+						channel.deleteOperator(sub_str);
+						// 채널의 관리자에서 제거.
+					}
 				}
 			case 'l':
 				if (cur_str[0] == '+') {
@@ -186,7 +195,9 @@ void Mode::execute(const Parser& parser, int client_fd)
 					channel.setModeOptionL(false);
 				}
 			default:
+				throw exception();
 		}
 	}
+	client.setSendBuff(Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
 }
 
