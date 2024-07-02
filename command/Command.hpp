@@ -3,6 +3,7 @@
 
 #include "../channel/Channel.hpp"
 #include "../parser/Parser.hpp"
+#include "../reply/Reply.hpp"
 #include <map>
 #include "../client/Client.hpp"
 using namespace std;

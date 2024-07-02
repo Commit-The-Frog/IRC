@@ -21,17 +21,17 @@ class Nick: public Command
 			Client&			client = this->client_map[client_fd];
 
 			if (params.size() == 0) {
-				client.setSendBuff(Reply("431", client.getNickname(), ":No nickname given"));
+				client.setSendBuff(Reply::getCodeMsg("431", client.getNickname(), ":No nickname given"));
 			} else {
 				nick = params[0];
 				try {
 					if (nick.find(' ') != string::npos || nick[0] == '&' || nick[0] == '#') {
-						client.setSendBuff(Reply("432", client.getNickname(), nick + " :Erroneus nickname"));
+						client.setSendBuff(Reply::getCodeMsg("432", client.getNickname(), nick + " :Erroneus nickname"));
 						return ;
 					}
 					client.setNickname(nick);
 				} catch (Client::AlreadyInUseNickException& e) {
-					client.setSendBuff(Reply("433", client.getNickname(), nick + " :Nickname is already in use"));
+					client.setSendBuff(Reply::getCodeMsg("433", client.getNickname(), nick + " :Nickname is already in use"));
 				} catch (Client::SameNickException& e) {}
 			}
 		}
