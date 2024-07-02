@@ -7,6 +7,7 @@
 #include "Pass.hpp"
 #include "User.hpp"
 #include "Nick.hpp"
+#include "Unknown.hpp"
 
 class CommandFactory
 {
@@ -22,6 +23,7 @@ class CommandFactory
 			cmd_map[PASS] = new Pass(this->client_map, this->channel_map, this->server_pwd);
 			cmd_map[USER] = new User(this->client_map, channel_map);
 			cmd_map[NICK] = new Nick(this->client_map, channel_map);
+			cmd_map[UNKNOWN] = new Unknown(client_map, channel_map);
 		};
 		~CommandFactory() {
 			map<int, Command*>::iterator it;
@@ -45,7 +47,7 @@ class CommandFactory
 				cmd_type = USER;
 			// ...
 			else
-				throw invalid_argument("COMMAND NOT FOUND");
+				cmd_type = UNKNOWN;
 			return cmd_map.find(cmd_type)->second;
 		};
 };
