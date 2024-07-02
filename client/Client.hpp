@@ -4,7 +4,6 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
-#include "../reply/Reply.hpp"
 #include "../channel/Channel.hpp"
 #include <map>
 #include <exception>
