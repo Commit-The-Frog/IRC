@@ -12,7 +12,8 @@ enum {
 	PASS,
 	NICK,
 	USER,
-	PRIVMSG
+	PRIVMSG,
+	UNKNOWN
 };
 
 class Command
