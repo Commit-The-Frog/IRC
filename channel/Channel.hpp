@@ -32,11 +32,11 @@ class Channel
 		Channel &operator=(const Channel &channel);
 		void setChannelName(const string &channel_name);
 		const string &getChannelName() const;
-		void addOperator(const string &nick, Client *client);
+		void addOperator(const string &nick, Client &client);
 		void deleteOperator(const string &nick);
-		void addMember(const string &nick, Client *clientt);
-		void deleteMember(const string &nick, Client *client);
-		void addInvite(const string &nick, Client *client);
+		void addMember(const string &nick, Client &clientt);
+		void deleteMember(const string &nick, Client &client);
+		void addInvite(const string &nick, Client &client);
 		void deleteInvite(const string &nick);
 		const std::map<string, Client*> &getOperatorMap() const;
 		const std::map<string, Client*> &getMemberMap() const;
