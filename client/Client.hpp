@@ -23,7 +23,7 @@ class Client
 		string realname;
 		bool is_passed;
 		string ip_addr;
-		map<string, Channel> channel_map;
+		map<string, Channel *> channel_map;
 		static map<string, int>	nick_map;
 	public:
 		Client();
@@ -45,6 +45,8 @@ class Client
 		bool getIsRegistered() const;
 		void setIsPassedTrue();
 		bool getIsPassed() const;
+		void addChannel(const string &channel_name, Channel &channel);
+		void deleteChannel(const string &channel_name);
 
 		static int getSockFdByNick(const string& nick);
 
