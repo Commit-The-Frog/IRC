@@ -41,44 +41,52 @@ string Mode::getModeString(vector<string>& str_v)
 	return (res);
 }
 
+string Mode::getCurModeString(const Channel& channel) {
+	vector<string> mode_vec;
+
+	if (channel.getModeOptionI())
+		mode_vec.push_back("+i");
+	if (channel.getModeOptionT())
+		mode_vec.push_back("+t");
+	if (channel.getModeOptionK())
+		mode_vec.push_back("+k " + channel.getKey());
+	if (channel.getModeOptionL())
+		mode_vec.push_back("+l " + channel.getLimit());
+	return (getModeString(mode_vec));
+}
+
+/*	[Mode::execute]
+1.	채널이 존재하는지 확인한다.
+2.	user가 채널의 operator인지 확인한다.
+3.	파싱 이후에 적용.
+	- vector로 modestring을 관리한다.
+	- 이후 params과 modestring을 순회하면서 modestring 뒤에 mode param을 붙인다.
+	- 만약 params가 남는다면, 남는 param은 무시한다.
+
+4.	파싱이 된 vector들을 순회하면서 적용시킨다. 적용이 안된 mode는 vector에서 삭제한다.
+5.	이후 privmsg로 적용된 모드를 설명해주기 위해서, 파싱이 된 vector들을 역순으로 합친다.
+	만약에 mode param이 있는 경우 뒤에다 해당 param을 붙여주는데, -k 이면 *을 붙인다.
+*/
 void Mode::execute(const Parser& parser, int client_fd)
 {
 	Client& client = client_map[client_fd];
 
-	// 1.	채널이 존재하는지 확인한다.
-	// 2.	user가 채널의 operator인지 확인한다.
-	// 3.	파싱 이후에 적용.
-	//			1. vector로 modestring을 관리한다.
-	//			2. 이후 params과 modestring을 순회하면서 modestring 뒤에 mode param을 붙인다.
-	//			3. 만약 params가 남는다면, 남는 param은 무시한다.
-	// 4.	파싱이 된 vector들을 순회하면서 적용시킨다. 적용이 안된 mode는 vector에서 삭제한다.
-	// 5.	이후 privmsg로 적용된 모드를 설명해주기 위해서, 파싱이 된 vector들을 역순으로 합친다.
-	//		만약에 mode param이 있는 경우 뒤에다 해당 param을 붙여주는데, -k 이면 *을 붙인다.
+
 	vector<string> mode_vec;
 	vector<string> changed_mode_vec;
 	vector<string> params = parser.getParams();
-	if (params.size() < 2) {
-		// 461 MODE :Not enough parameters
+	if (params.size() < 2) { // 461 MODE :Not enough parameters
+		client.setSendBuff(Reply::getCodeMsg("461", client.getNickname(), ":Not enough parameters"));
 	}
 	map<string, Channel>::iterator it;
 	if ((it = channel_map.find(params[0])) == channel_map.end()) {
+		client.setSendBuff(Reply::getCodeMsg("403", client.getNickname(), params[0] + " :No such channel"));
 		// ERR_NOSUCHCHANNEL (403)
 	}
 	Channel& channel = it->second;
-	if (params.size() == 2) {
-		if (channel.getModeOptionI())
-			mode_vec.push_back("+i");
-		if (channel.getModeOptionT())
-			mode_vec.push_back("+t");
-		if (channel.getModeOptionK()) {
-			mode_vec.push_back("+k " + channel.getKey());
-		}
-		if (channel.getModeOptionL()) {
-			mode_vec.push_back("+l " + channel.getLimit());
-		}
-		client.setSendBuff(Reply::getCodeMsg("324", client.getNickname(), params[0] + " " + getModeString(mode_vec)));
-		// mode 정보를 전달해줍니다. +인 애들만 합쳐서 전달.
-	} else {
+	if (params.size() == 2) { // RPL_CHANNELMODEIS (324)
+		client.setSendBuff(Reply::getCodeMsg("324", client.getNickname(), params[0] + " " + getCurModeString(channel)));
+	} else { // Mode Setting
 		char	flag = 0;
 		for (int i = 0; i < params[1].length(); i++) {
 			if (params[1][i] == '+' || params[1][i] == '-') {
@@ -90,9 +98,9 @@ void Mode::execute(const Parser& parser, int client_fd)
 				mode_vec_element += flag;
 				mode_vec_element += params[1][i];
 				mode_vec.push_back(mode_vec_element);
-			} else {
-				// 없는 설정값임을 알려줘야된다.
-				break;
+			} else { // ERR_UNKNOWNMODE (472) || ERR_UMODEUNKNOWNFLAG (501)
+				client.setSendBuff(Reply::getCodeMsg("472", client.getNickname(), params[1][i] + " :is unknown mode char to me"));
+				return ;
 			}
 		}
 		vector<string>::iterator mode_it = mode_vec.begin();
@@ -100,10 +108,8 @@ void Mode::execute(const Parser& parser, int client_fd)
 		param_it += 2;
 		while (mode_it != mode_vec.end()) {
 			if ((*mode_it).compare("+k") == 0 || (*mode_it).compare("-k") == 0 || (*mode_it).compare("+o") == 0 || (*mode_it).compare("-o") == 0 || (*mode_it).compare("+l") == 0) {
-				if (param_it == params.end()) {
-					break;
-					//파라미터 부족한 에러 발생.
-				}
+				if (param_it == params.end())
+					return ;
 				(*mode_it) += (" " + *param_it);
 				param_it++;
 			}
@@ -162,24 +168,25 @@ void Mode::execute(const Parser& parser, int client_fd)
 				try {
 					client_fd = Client::getSockFdByNick(sub_str);
 				} catch (Client::NoSuchNickException &e) {
-					// 401 <client> <nick> :No such nick/channel
+					client.setSendBuff(Reply::getCodeMsg("401", client.getNickname(), sub_str + " :No such nick/channel"));
+					continue;
 				}
 				if (cur_str[0] == '+') {
 					Client& target_client = client_map[client_fd];
 					if (!channel.isMember(sub_str)) {
-						// 441 :They aren't on that channel
+						client.setSendBuff(Reply::getCodeMsg("441", client.getNickname(), \
+							sub_str + " " + params[0] + " :They aren't on that channel"));
 					} else if (!channel.isOperator(sub_str)) {
 						changed_mode_vec.push_back(*it);
 						channel.addOperator(sub_str, target_client);
-						// 채널의 관리자로 추가.
 					}
 				} else {
 					if (!channel.isMember(sub_str)) {
-						// 441 :They aren't on that channel
+						client.setSendBuff(Reply::getCodeMsg("441", client.getNickname(), \
+							sub_str + " " + params[0] + " :They aren't on that channel"));
 					} else if (channel.isOperator(sub_str)) {
 						changed_mode_vec.push_back(*it);
 						channel.deleteOperator(sub_str);
-						// 채널의 관리자에서 제거.
 					}
 				}
 			case 'l':
@@ -189,7 +196,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 					stringstream ss(sub_str);
 					ss >> limit;
 					if (ss.fail())
-						continue;// 이상한 값 들어왔음. 명령어 실행 x
+						continue;
 					channel.setLimit(limit);
 				} else {
 					channel.setModeOptionL(false);
