@@ -58,7 +58,7 @@ class Channel
 		void setModeOptionT(bool flag);
 		void setModeOptionK(bool flag);
 		void setModeOptionL(bool flag);
-		void sendAllClients(const string &msg);
+		void sendToAllMembers(const string &sender, const string &msg);
 };
 
 #endif
