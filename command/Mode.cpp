@@ -1,5 +1,11 @@
 #include "Mode.hpp"
 
+/*	[getModeString]
+	str_v는 "+i", "+k <mykey>", "+l 10"
+	과 같은 형식으로 이루어져있다.
+	이를, "+ikl <mykey> 10" 과 같은 형식으로 바꿔주는
+	함수이다.
+*/
 string Mode::getModeString(vector<string>& str_v)
 {
 	vector<string>	mode_compound;
@@ -215,12 +221,17 @@ void Mode::execute(const Parser& parser, int client_fd)
 					if (ss.fail())
 						continue;
 					channel.setLimit(limit);
+					changed_mode_vec.push_back(*it);
 				} else {
-					channel.setModeOptionL(false);
+					if (channel.getModeOptionL())
+					{
+						channel.setModeOptionL(false);
+						changed_mode_vec.push_back(*it);
+						channel.setLimit(-1);
+					}
 				}
 				break;
 			default:
-				throw exception();
 				break;
 		}
 	}
