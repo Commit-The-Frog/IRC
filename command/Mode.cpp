@@ -6,7 +6,7 @@ string Mode::getModeString(vector<string>& str_v)
 	char			flag = 0;
 	string			res;
 
-	for (vector<string>::iterator it = str_v.begin(); it == str_v.end(); it++) {
+	for (vector<string>::iterator it = str_v.begin(); it != str_v.end(); it++) {
 		string cur_str = *it;
 		string sub_str = "";
 		size_t pos = cur_str.find(' ');
@@ -33,7 +33,7 @@ string Mode::getModeString(vector<string>& str_v)
 				mode_compound.push_back(sub_str);
 		}
 	}
-	for (vector<string>::iterator it = mode_compound.begin(); it == mode_compound.end(); it++) {
+	for (vector<string>::iterator it = mode_compound.begin(); it != mode_compound.end(); it++) {
 		if (it != mode_compound.begin())
 			res += " ";
 		res += *it;
@@ -43,16 +43,22 @@ string Mode::getModeString(vector<string>& str_v)
 
 string Mode::getCurModeString(const Channel& channel) {
 	vector<string> mode_vec;
+	stringstream	ss;
 
-	if (channel.getModeOptionI())
+	ss << "+l ";
+	if (channel.getModeOptionI()) {
 		mode_vec.push_back("+i");
+	}
 	if (channel.getModeOptionT())
 		mode_vec.push_back("+t");
 	if (channel.getModeOptionK())
 		mode_vec.push_back("+k " + channel.getKey());
-	if (channel.getModeOptionL())
-		mode_vec.push_back("+l " + channel.getLimit());
-	return (getModeString(mode_vec));
+	if (channel.getModeOptionL()) {
+		ss << channel.getLimit();
+		mode_vec.push_back(ss.str());
+	}
+	string mode_str = getModeString(mode_vec);
+	return (mode_str);
 }
 
 /*	[Mode::execute]
@@ -75,17 +81,21 @@ void Mode::execute(const Parser& parser, int client_fd)
 	vector<string> mode_vec;
 	vector<string> changed_mode_vec;
 	vector<string> params = parser.getParams();
-	if (params.size() < 2) { // 461 MODE :Not enough parameters
+	if (params.size() < 1) { // 461 MODE :Not enough parameters
 		client.setSendBuff(Reply::getCodeMsg("461", client.getNickname(), ":Not enough parameters"));
+		return ;
 	}
 	map<string, Channel>::iterator it;
 	if ((it = channel_map.find(params[0])) == channel_map.end()) {
 		client.setSendBuff(Reply::getCodeMsg("403", client.getNickname(), params[0] + " :No such channel"));
+		return ;
 		// ERR_NOSUCHCHANNEL (403)
 	}
 	Channel& channel = it->second;
-	if (params.size() == 2) { // RPL_CHANNELMODEIS (324)
-		client.setSendBuff(Reply::getCodeMsg("324", client.getNickname(), params[0] + " " + getCurModeString(channel)));
+	if (params.size() == 1) { // RPL_CHANNELMODEIS (324)
+		string cur_mode_str = getCurModeString(channel);
+		client.setSendBuff(Reply::getCodeMsg("324", client.getNickname(), params[0] + " " + cur_mode_str));
+		return ;
 	} else { // Mode Setting
 		char	flag = 0;
 		for (int i = 0; i < params[1].length(); i++) {
@@ -99,7 +109,10 @@ void Mode::execute(const Parser& parser, int client_fd)
 				mode_vec_element += params[1][i];
 				mode_vec.push_back(mode_vec_element);
 			} else { // ERR_UNKNOWNMODE (472) || ERR_UMODEUNKNOWNFLAG (501)
-				client.setSendBuff(Reply::getCodeMsg("472", client.getNickname(), params[1][i] + " :is unknown mode char to me"));
+				stringstream ss;
+				ss << params[1][i];
+				ss << " :is unknown mode char to me";
+				client.setSendBuff(Reply::getCodeMsg("472", client.getNickname(), ss.str()));
 				return ;
 			}
 		}
@@ -113,10 +126,10 @@ void Mode::execute(const Parser& parser, int client_fd)
 				(*mode_it) += (" " + *param_it);
 				param_it++;
 			}
-			it++;
+			mode_it++;
 		}
 	}
-	for (vector<string>::iterator it = mode_vec.begin(); it == mode_vec.end(); it++) {
+	for (vector<string>::iterator it = mode_vec.begin(); it != mode_vec.end(); it++) {
 		string cur_str = *it;
 		string sub_str = "";
 		size_t pos = cur_str.find(' ');
@@ -137,6 +150,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 						channel.setModeOptionI(false);
 					}
 				}
+				break;
 			case 't':
 				if (cur_str[0] == '+') {
 					if (!channel.getModeOptionT()) {
@@ -149,13 +163,14 @@ void Mode::execute(const Parser& parser, int client_fd)
 						channel.setModeOptionT(false);
 					}
 				}
+				break;
 			case 'k':
 				if (cur_str[0] == '+') {
 					if (!channel.getModeOptionK()) {
-						changed_mode_vec.push_back(*it);
 						channel.setModeOptionK(true);
-						channel.setKey(sub_str);
 					}
+					changed_mode_vec.push_back(*it);
+					channel.setKey(sub_str);
 				} else {
 					if (channel.getModeOptionK()) {
 						changed_mode_vec.push_back(*it);
@@ -163,6 +178,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 						channel.setKey("");
 					}
 				}
+				break;
 			case 'o':
 				int client_fd;
 				try {
@@ -189,6 +205,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 						channel.deleteOperator(sub_str);
 					}
 				}
+				break;
 			case 'l':
 				if (cur_str[0] == '+') {
 					channel.setModeOptionL(true);
@@ -201,10 +218,13 @@ void Mode::execute(const Parser& parser, int client_fd)
 				} else {
 					channel.setModeOptionL(false);
 				}
+				break;
 			default:
 				throw exception();
+				break;
 		}
 	}
-	client.setSendBuff(Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
+	if (changed_mode_vec.size() > 0)
+		client.setSendBuff(Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
 }
 
