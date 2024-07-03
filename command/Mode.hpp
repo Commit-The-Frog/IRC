@@ -10,6 +10,7 @@ using namespace std;
 class Mode: public Command {
 	private:
 		string	getModeString(vector<string>& str_v);
+		string	getCurModeString(const Channel& channel);
 	public:
 		Mode(map<int, Client>& client_map, map<string, Channel>& channel_map)
 		:Command(client_map, channel_map) {};
