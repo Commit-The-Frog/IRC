@@ -9,7 +9,6 @@ enum {
 	MODE_I,
 	MODE_T,
 	MODE_K,
-	MODE_O,
 	MODE_L
 };
 
@@ -18,44 +17,48 @@ class Client;
 class Channel
 {
 	private:
-		std::map<string, Client> operator_map;
-		std::map<string, Client> member_map;
-		std::map<string, Client> inivite_map;
+		string channel_name;
+		std::map<string, Client *> operator_map;
+		std::map<string, Client *> member_map;
+		std::map<string, Client *> inivite_map;
 		string key;
 		string topic;
 		int limit;
-		bool options[5];
+		bool options[4];
 	public:
 		Channel() {};
-		~Channel() {};
-		Channel(Channel const &channel);
-		Channel &operator=(Channel const &channel);
-		void addOperator(string nick, Client &client);
-		void deleteOperator(string nick, Client &client);
-		void addMember(string nick, Client &client);
-		void deleteMember(string nick, Client &client);
-		void addInvite(string nick, Client &client);
-		void deleteInvite(string nick, Client &client);
-		const std::map<string, Client> &getOperatorMap() const;
-		const std::map<string, Client> &getMemberMap() const;
-		const std::map<string, Client> &getInviteMap() const;
-		void setKey(string str);
+		Channel(const Channel &channel);
+		~Channel();
+		Channel &operator=(const Channel &channel);
+		void setChannelName(const string &channel_name);
+		const string &getChannelName() const;
+		void addOperator(const string &nick, Client &client);
+		void deleteOperator(const string &nick);
+		void addMember(const string &nick, Client &clientt);
+		void deleteMember(const string &nick, Client &client);
+		void addInvite(const string &nick, Client &client);
+		void deleteInvite(const string &nick);
+		const std::map<string, Client*> &getOperatorMap() const;
+		const std::map<string, Client*> &getMemberMap() const;
+		const std::map<string, Client*> &getInviteMap() const;
+		bool isOperator(const string &nick);
+		bool isMember(const string &nick);
+		bool isInvited(const string &nick);
+		void setKey(const string &str);
 		const string &getKey() const;
-		void setTopic(string str);
+		void setTopic(const string &str);
 		const string &getTopic() const;
 		void setLimit(int limit);
 		int getLimit() const;
 		bool getModeOptionI() const;
 		bool getModeOptionT() const;
 		bool getModeOptionK() const;
-		bool getModeOptionO() const;
 		bool getModeOptionL() const;
 		void setModeOptionI(bool flag);
 		void setModeOptionT(bool flag);
 		void setModeOptionK(bool flag);
-		void setModeOptionO(bool flag);
 		void setModeOptionL(bool flag);
-		void sendAllClients(string const &msg);
+		void sendAllClients(const string &msg);
 };
 
 #endif
