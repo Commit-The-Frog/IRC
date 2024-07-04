@@ -18,7 +18,7 @@ void	Topic::execute(const Parser& parser, int client_fd) {
 		client.setSendBuff(Reply::getCodeMsg("442", client.getNickname(), params[0] + " :You're not on that channel"));
 		return ;
 	}
-	if (params.size() == 1) {
+	if (params.size() == 1) { // topic 받기
 		string topic = channel.getTopic();
 		if (topic.length() < 1) {
 			client.setSendBuff(Reply::getCodeMsg("331", client.getNickname(), params[0] + " :No topic is set"));
@@ -27,7 +27,7 @@ void	Topic::execute(const Parser& parser, int client_fd) {
 			client.setSendBuff(Reply::getCodeMsg("333", client.getNickname(), params[0] + " " + channel.getTopicWhoTime()));
 		}
 		// check topic
-	} else {
+	} else { // topic 새로 설정
 		if (channel.getModeOptionT() && !channel.isOperator(client.getNickname())) {
 			client.setSendBuff(Reply::getCodeMsg("482", client.getNickname(), params[0] + " :You're not channel operator"));
 			return ;
