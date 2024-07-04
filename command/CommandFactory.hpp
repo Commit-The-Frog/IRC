@@ -9,6 +9,9 @@
 #include "Nick.hpp"
 #include "Privmsg.hpp"
 #include "Unknown.hpp"
+#include "Mode.hpp"
+#include "Join.hpp"
+
 
 class CommandFactory
 {
@@ -21,9 +24,11 @@ class CommandFactory
 		 CommandFactory(map<int, Client>& client_map, map<string, Channel>& channel_map, const string& server_pwd)
 		 :client_map(client_map), channel_map(channel_map), server_pwd(server_pwd)
 		{
-			cmd_map[PASS] = new Pass(this->client_map, this->channel_map, this->server_pwd);
-			cmd_map[USER] = new User(this->client_map, this->channel_map);
-			cmd_map[NICK] = new Nick(this->client_map, this->channel_map);
+			cmd_map[PASS] = new Pass(client_map, channel_map, server_pwd);
+			cmd_map[USER] = new User(client_map, this->channel_map);
+			cmd_map[NICK] = new Nick(client_map, channel_map);
+			cmd_map[MODE] = new Mode(client_map, channel_map);
+			cmd_map[JOIN] = new Join(client_map, this->channel_map);
 			cmd_map[PRIVMSG] = new Privmsg(this->client_map, this->channel_map);
 			cmd_map[UNKNOWN] = new Unknown(client_map, this->channel_map);
 		};
@@ -47,6 +52,10 @@ class CommandFactory
 				cmd_type = NICK;
 			else if(cmd.compare("USER") == 0)
 				cmd_type = USER;
+			else if (cmd.compare("JOIN") == 0)
+				cmd_type = JOIN;
+			else if (cmd.compare("MODE") == 0)
+				cmd_type = MODE;
 			else if (cmd.compare("PRIVMSG") == 0)
 				cmd_type = PRIVMSG;
 			// ...

@@ -15,6 +15,8 @@ const char* Join::JoinVerificateInviteException::what() const throw() {
 void Join::verificateKey(const Channel &channel, const string &str) {
 	if (channel.getModeOptionK())  {
 		if (channel.getKey() != str) {
+			cout << "channel key : " << channel.getKey() << endl;
+			cout << "input key : " << str << endl; 
 			throw Join::JoinVerificateKeyException();
 		}
 	}
@@ -41,13 +43,12 @@ map<string,string> Join::joinParse(const string &channels, const string &keys) {
 	std::string key;
 	map<string, string> join_map;
 
-	std::getline(keys_, key, ',');
     while (std::getline(channels_, channel, ',')) {
 		if (join_map.find(channel) == join_map.end()) {
 			if (std::getline(keys_, key, ',')) {
 				join_map[channel] = key;
 			} else {
-				join_map[channel] = key;
+				join_map[channel] = "";
 			}
 		}
     }
@@ -56,34 +57,36 @@ map<string,string> Join::joinParse(const string &channels, const string &keys) {
 
 void Join::channelJoinResponse(Client &client, string channel_name)
 {
+	// 채널에 존재하는 모든 멤버에 대한 닉네임을 name_list 에 만든후 join 한 클라이언트에 대해 응답
+	// topic 에 관한 응답 추가해야함 (미완)
 	string name_list;
 	Channel &channel = channel_map[channel_name];
 	map<string, Client *> member_map = channel.getMemberMap();
 	map<string, Client *> operator_map = channel.getOperatorMap();
 
 	
-	for (map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); it++) {
+	for (map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); it++) { 
 		string curr_client_name = it->first;
 		if (operator_map.find(curr_client_name) != operator_map.end()) {
-			name_list += '@ ';
+			name_list += "@"; // 오퍼레이터일 경우
 		}
 		name_list += curr_client_name;
-		name_list += ' ';
+		name_list += " ";
 	}
-	
 	client.setSendBuff(Reply::getCommonMsg(client, "Join ", channel_name));
 	client.setSendBuff(Reply::getCodeMsg("353", client.getNickname(), "= " + channel_name + " :" + name_list));
 	client.setSendBuff(Reply::getCodeMsg("366", client.getNickname(), " :End of /LINKS list"));
-	// member_map에 있는 애들과 operator_map  에 있는 애들 비교해서 중복돼서...
 }
 
 void Join::execute(const Parser &parser, int fd)
 {
-	map<string, string> join_map = joinParse(parser.getParams()[0], parser.getParams()[1]);
+	map<string, string> join_map = joinParse(parser.getParams()[0], parser.getParams()[1]); // params 파싱해서 채널네임과 키 짝지어줌
 	Client &client = client_map[fd];
 	string client_name = client.getNickname();
 
-	if (parser.getParams().size() == 0)
+	if (!client.getIsRegistered()) // registered 안되어있을 경우 아무 동작도 안함
+		return ;
+	if (parser.getParams().size() == 0) // params 없을 경우
 	{
 		client.setSendBuff(Reply::getCodeMsg("461", client_name, " :Not enough parameters"));
 		return ;
@@ -91,17 +94,24 @@ void Join::execute(const Parser &parser, int fd)
 	for (map<string, string>::iterator it_j = join_map.begin(); it_j != join_map.end(); it_j++) {
 		string channel_name = it_j->first;
 		string channel_key = it_j->second;
-		if (channel_name.at(0) != '#') {
+		if (channel_name.at(0) != '#') { // 유효한 채널 네임인지 확인 (# 붙어있어야함)
 			client.setSendBuff(Reply::getCodeMsg("403",client_name, channel_name + " :No such channel"));
 			continue;
 		}
 		map<string, Channel>::iterator it = channel_map.find(channel_name);
-		if (it != channel_map.end()) {
+		if (it != channel_map.end()) { // 이미 존재하는 채널일 경우
 			Channel &curr_channel = it->second;
+			if (curr_channel.isMember(client_name)) { // 이미 해당 채널의 멤버이면 아무 동작도 안함
+				continue;
+			}
 			try {
-				verificateKey(curr_channel, channel_key);
-				verificateLimit(curr_channel);
-				verificateInvite(curr_channel,fd);
+				verificateKey(curr_channel, channel_key); // key 검증
+				verificateLimit(curr_channel); // limit 검증
+				verificateInvite(curr_channel,fd); // inbite 검증
+				curr_channel.addMember(client_name, client); // 채널에 추가
+				channelJoinResponse(client, channel_name); // 조인 응답
+				curr_channel.sendToAllMembers(client_name, Reply::getCommonMsg(client, "JOIN", channel_name)); // 채널에 속한 모든 멤버에게 해당 클라이언트가 입장햇음을 알림
+				cout << client_name << "join in" << channel_name << endl;
 			} catch(Join::JoinVerificateKeyException &e) {
 				client.setSendBuff(Reply::getCodeMsg("475", client_name, channel_name + " :Cannot join channel (+k)"));
 			} catch (Join::JoinVerificateLimitException &e) {
@@ -109,15 +119,12 @@ void Join::execute(const Parser &parser, int fd)
 			} catch (Join::JoinVerificateInviteException &e) {
 				client.setSendBuff(Reply::getCodeMsg("473", client_name, channel_name + " :Cannot join channel (+i)"));
 			}
-			curr_channel.addMember(client_name, client);
-			channelJoinResponse(client, channel_name);
-			cout << client_name << "join in" << channel_name << endl;
-			// 잘  들어왔음 응답 보내야함
-		} else {
-			channel_map[channel_name] = Channel(channel_name);
+		} else { // 새로 만든 채널일 경우
+			channel_map[channel_name] = Channel(channel_name); // 채널 생성후 채널리스트에 추가
 			Channel &curr_channel = channel_map[channel_name];
-			curr_channel.addMember(client_name, client);
-			channelJoinResponse(client, channel_name);
+			curr_channel.addMember(client_name, client); // 클라이언트 채널에 추가
+			curr_channel.addOperator(client_name, client); // 클라이언트 오퍼레이터로 추가
+			channelJoinResponse(client, channel_name); // 조인 응답
 			cout << client_name << "join in" << channel_name << endl;
 		}
 	}

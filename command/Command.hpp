@@ -12,6 +12,8 @@ enum {
 	PASS,
 	NICK,
 	USER,
+	MODE,
+	JOIN,
 	PRIVMSG,
 	UNKNOWN
 };
