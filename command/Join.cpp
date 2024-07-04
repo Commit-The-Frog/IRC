@@ -61,8 +61,6 @@ void Join::channelJoinResponse(Client &client, string channel_name)
 	string name_list;
 	Channel &channel = channel_map[channel_name];
 	map<string, Client *> member_map = channel.getMemberMap();
-	map<string, Client *> operator_map = channel.getOperatorMap();
-
 
 	for (map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); it++) {
 		string curr_client_name = it->first;
@@ -129,7 +127,7 @@ void Join::execute(const Parser &parser, int fd)
 			channel_map[channel_name] = Channel(channel_name); // 채널 생성후 채널리스트에 추가
 			Channel &curr_channel = channel_map[channel_name];
 			curr_channel.addMember(client_name, client); // 클라이언트 채널에 추가
-			curr_channel.addOperator(client_name, client); // 클라이언트 오퍼레이터로 추가
+			curr_channel.addOperator(client_name); // 클라이언트 오퍼레이터로 추가
 			channelJoinResponse(client, channel_name); // 조인 응답
 			cout << client_name << "join in" << channel_name << endl;
 		}
