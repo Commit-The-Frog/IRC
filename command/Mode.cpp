@@ -207,7 +207,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 							sub_str + " " + params[0] + " :They aren't on that channel"));
 					} else if (!channel.isOperator(sub_str)) {
 						changed_mode_vec.push_back(*it);
-						channel.addOperator(sub_str, target_client);
+						channel.addOperator(sub_str);
 					}
 				} else {
 					if (!channel.isMember(sub_str)) {
