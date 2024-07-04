@@ -58,7 +58,7 @@ class Privmsg : public Command
 				Client& targetClient = client_map.find(Client::getSockFdByNick(*it))->second;
 				targetClient.setSendBuff(Reply::getCommonMsg(targetClient, "PRIVMSG", ttbs));
 			} catch (Client::NoSuchNickException e) {
-				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + e.what()));
+				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
 				cout << "unknown exception ocuured\n";
 			}
@@ -71,7 +71,7 @@ class Privmsg : public Command
 					throw Channel::NoSuchChannelException();
 				cit->second.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
 			} catch (Channel::NoSuchChannelException& e) {
-				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + e.what()));
+				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
 				cout << "unknown exception ocuured\n";
 			}
