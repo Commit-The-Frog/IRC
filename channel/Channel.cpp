@@ -13,6 +13,7 @@ Channel::Channel(const Channel &channel) {
 }
 
 Channel &Channel::operator=(const Channel &channel) {
+	channel_name = channel.channel_name;
 	operator_set = channel.operator_set;
 	member_map = channel.member_map;
 	invite_set = channel.invite_set;
@@ -56,14 +57,15 @@ void Channel::deleteMember(const string &nick, Client &client) {
 	client.deleteChannel(channel_name);
 }
 
-void Channel::addInvite(const string &nick) {
+void Channel::addInvite(const string &nick, Client& client) {
 	invite_set.insert(nick);
+	client.addInvite(channel_name, *this);
 }
 
-void Channel::deleteInvite(const string &nick) {
+void Channel::deleteInvite(const string &nick, Client& client) {
 	invite_set.erase(nick);
+	client.deleteInvite(channel_name);
 }
-
 
 const std::map<string, Client *> &Channel::getMemberMap() const {
 	return member_map;
@@ -103,7 +105,7 @@ const string &Channel::getTopic() const {
 	return topic;
 }
 
-const string &Channel::getTopicWhoTime() const {
+string Channel::getTopicWhoTime() const {
 	return (this->latest_topic_set_user + " " + this->latest_topic_set_time);
 }
 
