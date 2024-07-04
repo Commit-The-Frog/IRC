@@ -69,7 +69,7 @@ class Privmsg : public Command
 				cit = channel_map.find(*it);
 				if (cit == channel_map.end())
 					throw Channel::NoSuchChannelException();
-				cit->second.sendToAllMembers(sender, Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
+				cit->second.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
 			} catch (Channel::NoSuchChannelException& e) {
 				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + e.what()));
 			} catch (...) {
