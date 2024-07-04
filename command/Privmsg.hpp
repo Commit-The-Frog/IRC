@@ -70,9 +70,9 @@ class Privmsg : public Command
 				map<string, Channel>::iterator cit;
 				cit = channel_map.find(*it);
 				if (cit == channel_map.end())
-					throw Channel::NoSuchChannelException();
+					throw Client::NoSuchNickException();
 				cit->second.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
-			} catch (Channel::NoSuchChannelException& e) {
+			} catch (Client::NoSuchNickException& e) {
 				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
 				cout << "unknown exception ocuured\n";
