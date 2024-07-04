@@ -59,7 +59,14 @@ class Channel
 		void setModeOptionT(bool flag);
 		void setModeOptionK(bool flag);
 		void setModeOptionL(bool flag);
-		void sendAllClients(const string &msg);
+		void sendToAllMembers(const string &sender, const string &msg);
+
+		class NoSuchChannelException: public exception {
+			public:
+				virtual const char* what() const throw() {
+					return (":No such nick/channel");
+				}
+		};
 };
 
 #endif

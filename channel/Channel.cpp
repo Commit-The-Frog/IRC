@@ -145,8 +145,9 @@ void Channel::setModeOptionL(bool flag) {
 	options[MODE_L] = flag;
 }
 
-void Channel::sendAllClients(const string &msg) {
+void Channel::sendToAllMembers(const string &sender, const string &msg) {
 	for (std::map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); ++it) {
-		it->second->setSendBuff(msg);
+		if (it->second->getNickname().compare(sender) != 0)
+			it->second->setSendBuff(msg);
 	}
 }

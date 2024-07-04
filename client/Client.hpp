@@ -65,7 +65,7 @@ class Client
 		class NoSuchNickException: public exception {
 			public:
 				virtual const char* what() const throw() {
-					return ("No Such Nickname");
+					return (":No such nick/channel");
 				}
 		};
 };
