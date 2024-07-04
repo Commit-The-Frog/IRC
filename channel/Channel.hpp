@@ -27,6 +27,7 @@ class Channel
 		bool options[4];
 	public:
 		Channel() {};
+		Channel(const string &str);
 		Channel(const Channel &channel);
 		~Channel();
 		Channel &operator=(const Channel &channel);
@@ -41,9 +42,9 @@ class Channel
 		const std::map<string, Client*> &getOperatorMap() const;
 		const std::map<string, Client*> &getMemberMap() const;
 		const std::map<string, Client*> &getInviteMap() const;
-		bool isOperator(const string &nick);
-		bool isMember(const string &nick);
-		bool isInvited(const string &nick);
+		bool isOperator(const string &nick) const;
+		bool isMember(const string &nick) const;
+		bool isInvited(const string &nick) const;
 		void setKey(const string &str);
 		const string &getKey() const;
 		void setTopic(const string &str);

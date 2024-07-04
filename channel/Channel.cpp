@@ -1,5 +1,13 @@
 #include "Channel.hpp"
 
+Channel::Channel(const string &str) {
+	channel_name = str;
+	options[MODE_I] = false;
+	options[MODE_T] = true;
+	options[MODE_K] = false;
+	options[MODE_L] = false;
+}
+
 Channel::Channel(const Channel &channel) {
 	*this = channel;
 }
@@ -68,15 +76,15 @@ const std::map<string, Client *> &Channel::getInviteMap() const {
 	return inivite_map;
 }
 
-bool Channel::isOperator(const string &nick) {
+bool Channel::isOperator(const string &nick) const {
 	return operator_map.find(nick) != operator_map.end();
 }
 
-bool Channel::isMember(const string &nick) {
+bool Channel::isMember(const string &nick) const {
 	return member_map.find(nick) != member_map.end();
 }
 
-bool Channel::isInvited(const string &nick) {
+bool Channel::isInvited(const string &nick) const {
 	return inivite_map.find(nick) != inivite_map.end();
 }
 
