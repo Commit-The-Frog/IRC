@@ -30,7 +30,7 @@ class CommandFactory
 			cmd_map[MODE] = new Mode(client_map, channel_map);
 			cmd_map[JOIN] = new Join(client_map, this->channel_map);
 			cmd_map[PRIVMSG] = new Privmsg(this->client_map, this->channel_map);
-			cmd_map[UNKNOWN] = new Unknown(client_map, this->channel_map);
+			cmd_map[UNKNOWN] = new Unknown(client_map, channel_map);
 		};
 		~CommandFactory() {
 			map<int, Command*>::iterator it;

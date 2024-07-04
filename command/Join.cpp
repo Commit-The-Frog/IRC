@@ -67,13 +67,17 @@ void Join::channelJoinResponse(Client &client, string channel_name)
 	
 	for (map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); it++) { 
 		string curr_client_name = it->first;
-		if (operator_map.find(curr_client_name) != operator_map.end()) {
-			name_list += "@"; // 오퍼레이터일 경우
+		if (channel.isOperator(curr_client_name)) {
+			name_list += "@";
 		}
 		name_list += curr_client_name;
 		name_list += " ";
 	}
 	client.setSendBuff(Reply::getCommonMsg(client, "Join ", channel_name));
+	if (channel.getTopic() != "") {
+		client.setSendBuff(Reply::getCodeMsg("332", client.getNickname(), " " + channel_name + " :" + channel.getTopic()));
+		client.setSendBuff(Reply::getCodeMsg("333", client.getNickname(), " " + channel_name + " :" + channel.getTopicWhoTime()));
+	}
 	client.setSendBuff(Reply::getCodeMsg("353", client.getNickname(), "= " + channel_name + " :" + name_list));
 	client.setSendBuff(Reply::getCodeMsg("366", client.getNickname(), " :End of /LINKS list"));
 }
@@ -91,6 +95,7 @@ void Join::execute(const Parser &parser, int fd)
 		client.setSendBuff(Reply::getCodeMsg("461", client_name, " :Not enough parameters"));
 		return ;
 	}
+	std::cout << "params " << endl;
 	for (map<string, string>::iterator it_j = join_map.begin(); it_j != join_map.end(); it_j++) {
 		string channel_name = it_j->first;
 		string channel_key = it_j->second;
