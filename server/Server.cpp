@@ -1,11 +1,17 @@
 #include "Server.hpp"
 
 Server::Server(int port, string pwd): _port(port), _pwd(pwd), commandFactory(client_map,channel_map, pwd) {
+	int option;
+	socklen_t optlen;
+
 	this->serv_sock_fd = socket(PF_INET, SOCK_STREAM, 0);
 	memset(&this->serv_addr, 0, sizeof(this->serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
+	optlen = sizeof(option);
+	option = true;
+	setsockopt(serv_sock_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&option, optlen);
 }
 
 Server::~Server() {
