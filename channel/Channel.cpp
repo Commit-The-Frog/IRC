@@ -56,14 +56,15 @@ void Channel::deleteMember(const string &nick, Client &client) {
 	client.deleteChannel(channel_name);
 }
 
-void Channel::addInvite(const string &nick) {
+void Channel::addInvite(const string &nick, Client& client) {
 	invite_set.insert(nick);
+	client.addInvite(channel_name, *this);
 }
 
-void Channel::deleteInvite(const string &nick) {
+void Channel::deleteInvite(const string &nick, Client& client) {
 	invite_set.erase(nick);
+	client.deleteInvite(channel_name);
 }
-
 
 const std::map<string, Client *> &Channel::getMemberMap() const {
 	return member_map;
