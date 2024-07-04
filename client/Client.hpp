@@ -7,6 +7,7 @@
 #include "../channel/Channel.hpp"
 #include <map>
 #include <exception>
+#include <set>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ class Client
 		bool is_passed;
 		string ip_addr;
 		map<string, Channel *> channel_map;
+		map<string, Channel *> invite_map;
 		static map<string, int>	nick_map;
 	public:
 		Client();
@@ -47,6 +49,8 @@ class Client
 		bool getIsPassed() const;
 		void addChannel(const string &channel_name, Channel &channel);
 		void deleteChannel(const string &channel_name);
+		void addInvite(const string& channel_name, Channel& channel);
+		void deleteInvite(const string& channel_name);
 
 		static int getSockFdByNick(const string& nick);
 
