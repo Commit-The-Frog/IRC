@@ -58,7 +58,6 @@ map<string,string> Join::joinParse(const string &channels, const string &keys) {
 void Join::channelJoinResponse(Client &client, string channel_name)
 {
 	// 채널에 존재하는 모든 멤버에 대한 닉네임을 name_list 에 만든후 join 한 클라이언트에 대해 응답
-	// topic 에 관한 응답 추가해야함 (미완)
 	string name_list;
 	Channel &channel = channel_map[channel_name];
 	map<string, Client *> member_map = channel.getMemberMap();
