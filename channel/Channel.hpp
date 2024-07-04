@@ -1,6 +1,7 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 #include <map>
+#include <set>
 #include <sstream>
 #include <ctime>
 #include "../client/Client.hpp"
@@ -20,9 +21,9 @@ class Channel
 {
 	private:
 		string channel_name;
-		std::map<string, Client *> operator_map;
 		std::map<string, Client *> member_map;
-		std::map<string, Client *> inivite_map;
+		set<string> operator_set;
+		set<string> invite_set;
 		string key;
 		string topic;
 		string latest_topic_set_user;
@@ -36,15 +37,13 @@ class Channel
 		Channel &operator=(const Channel &channel);
 		void setChannelName(const string &channel_name);
 		const string &getChannelName() const;
-		void addOperator(const string &nick, Client &client);
+		void addOperator(const string &nick);
 		void deleteOperator(const string &nick);
 		void addMember(const string &nick, Client &clientt);
 		void deleteMember(const string &nick, Client &client);
-		void addInvite(const string &nick, Client &client);
+		void addInvite(const string &nick);
 		void deleteInvite(const string &nick);
-		const std::map<string, Client*> &getOperatorMap() const;
 		const std::map<string, Client*> &getMemberMap() const;
-		const std::map<string, Client*> &getInviteMap() const;
 		bool isOperator(const string &nick);
 		bool isMember(const string &nick);
 		bool isInvited(const string &nick);

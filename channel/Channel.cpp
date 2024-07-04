@@ -5,9 +5,9 @@ Channel::Channel(const Channel &channel) {
 }
 
 Channel &Channel::operator=(const Channel &channel) {
-	operator_map = channel.operator_map;
+	operator_set = channel.operator_set;
 	member_map = channel.member_map;
-	inivite_map = channel.inivite_map;
+	invite_set = channel.invite_set;
 	key = channel.key;
 	topic = channel.topic;
 	for (int i = 0; i < 4; i++)
@@ -30,12 +30,12 @@ const string &Channel::getChannelName() const {
 	return this->channel_name;
 }
 
-void Channel::addOperator(const string &nick, Client &client) {
-	operator_map[nick] = &client;
+void Channel::addOperator(const string &nick) {
+	operator_set.insert(nick);
 }
 
 void Channel::deleteOperator(const string &nick) {
-	operator_map.erase(nick);
+	operator_set.erase(nick);
 }
 
 void Channel::addMember(const string &nick, Client &client) {
@@ -48,28 +48,21 @@ void Channel::deleteMember(const string &nick, Client &client) {
 	client.deleteChannel(channel_name);
 }
 
-void Channel::addInvite(const string &nick, Client &client) {
-	inivite_map[nick] = &client;
+void Channel::addInvite(const string &nick) {
+	invite_set.insert(nick);
 }
 
 void Channel::deleteInvite(const string &nick) {
-	inivite_map.erase(nick);
+	invite_set.erase(nick);
 }
 
-const std::map<string, Client *> &Channel::getOperatorMap() const {
-	return operator_map;
-}
 
 const std::map<string, Client *> &Channel::getMemberMap() const {
 	return member_map;
 }
 
-const std::map<string, Client *> &Channel::getInviteMap() const {
-	return inivite_map;
-}
-
 bool Channel::isOperator(const string &nick) {
-	return operator_map.find(nick) != operator_map.end();
+	return operator_set.find(nick) != operator_set.end();
 }
 
 bool Channel::isMember(const string &nick) {
@@ -77,7 +70,7 @@ bool Channel::isMember(const string &nick) {
 }
 
 bool Channel::isInvited(const string &nick) {
-	return inivite_map.find(nick) != inivite_map.end();
+	return invite_set.find(nick) != invite_set.end();
 }
 
 void Channel::setKey(const string &str) {
