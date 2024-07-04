@@ -7,6 +7,7 @@
 #include "Pass.hpp"
 #include "User.hpp"
 #include "Nick.hpp"
+#include "Privmsg.hpp"
 #include "Unknown.hpp"
 
 class CommandFactory
@@ -21,9 +22,10 @@ class CommandFactory
 		 :client_map(client_map), channel_map(channel_map), server_pwd(server_pwd)
 		{
 			cmd_map[PASS] = new Pass(this->client_map, this->channel_map, this->server_pwd);
-			cmd_map[USER] = new User(this->client_map, channel_map);
-			cmd_map[NICK] = new Nick(this->client_map, channel_map);
-			cmd_map[UNKNOWN] = new Unknown(client_map, channel_map);
+			cmd_map[USER] = new User(this->client_map, this->channel_map);
+			cmd_map[NICK] = new Nick(this->client_map, this->channel_map);
+			cmd_map[PRIVMSG] = new Privmsg(this->client_map, this->channel_map);
+			cmd_map[UNKNOWN] = new Unknown(client_map, this->channel_map);
 		};
 		~CommandFactory() {
 			map<int, Command*>::iterator it;
@@ -45,6 +47,8 @@ class CommandFactory
 				cmd_type = NICK;
 			else if(cmd.compare("USER") == 0)
 				cmd_type = USER;
+			else if (cmd.compare("PRIVMSG") == 0)
+				cmd_type = PRIVMSG;
 			// ...
 			else
 				cmd_type = UNKNOWN;
