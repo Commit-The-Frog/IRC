@@ -77,7 +77,7 @@ void Join::channelJoinResponse(Client &client, string channel_name)
 		client.setSendBuff(Reply::getCodeMsg("333", client.getNickname(), " " + channel_name + " :" + channel.getTopicWhoTime()));
 	}
 	client.setSendBuff(Reply::getCodeMsg("353", client.getNickname(), "= " + channel_name + " :" + name_list));
-	client.setSendBuff(Reply::getCodeMsg("366", client.getNickname(), " :End of /LINKS list"));
+	client.setSendBuff(Reply::getCodeMsg("366", client.getNickname(), channel_name + " :End of /NAMES list"));
 }
 
 void Join::execute(const Parser &parser, int fd)
