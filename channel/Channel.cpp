@@ -13,9 +13,10 @@ Channel::Channel(const Channel &channel) {
 }
 
 Channel &Channel::operator=(const Channel &channel) {
-	operator_map = channel.operator_map;
+	channel_name = channel.channel_name;
+	operator_set = channel.operator_set;
 	member_map = channel.member_map;
-	inivite_map = channel.inivite_map;
+	invite_set = channel.invite_set;
 	key = channel.key;
 	topic = channel.topic;
 	for (int i = 0; i < 4; i++)
@@ -38,12 +39,12 @@ const string &Channel::getChannelName() const {
 	return this->channel_name;
 }
 
-void Channel::addOperator(const string &nick, Client &client) {
-	operator_map[nick] = &client;
+void Channel::addOperator(const string &nick) {
+	operator_set.insert(nick);
 }
 
 void Channel::deleteOperator(const string &nick) {
-	operator_map.erase(nick);
+	operator_set.erase(nick);
 }
 
 void Channel::addMember(const string &nick, Client &client) {
@@ -56,28 +57,22 @@ void Channel::deleteMember(const string &nick, Client &client) {
 	client.deleteChannel(channel_name);
 }
 
-void Channel::addInvite(const string &nick, Client &client) {
-	inivite_map[nick] = &client;
+void Channel::addInvite(const string &nick, Client& client) {
+	invite_set.insert(nick);
+	client.addInvite(channel_name, *this);
 }
 
-void Channel::deleteInvite(const string &nick) {
-	inivite_map.erase(nick);
-}
-
-const std::map<string, Client *> &Channel::getOperatorMap() const {
-	return operator_map;
+void Channel::deleteInvite(const string &nick, Client& client) {
+	invite_set.erase(nick);
+	client.deleteInvite(channel_name);
 }
 
 const std::map<string, Client *> &Channel::getMemberMap() const {
 	return member_map;
 }
 
-const std::map<string, Client *> &Channel::getInviteMap() const {
-	return inivite_map;
-}
-
 bool Channel::isOperator(const string &nick) const {
-	return operator_map.find(nick) != operator_map.end();
+	return operator_set.find(nick) != operator_set.end();
 }
 
 bool Channel::isMember(const string &nick) const {
@@ -85,7 +80,7 @@ bool Channel::isMember(const string &nick) const {
 }
 
 bool Channel::isInvited(const string &nick) const {
-	return inivite_map.find(nick) != inivite_map.end();
+	return invite_set.find(nick) != invite_set.end();
 }
 
 void Channel::setKey(const string &str) {
@@ -110,7 +105,7 @@ const string &Channel::getTopic() const {
 	return topic;
 }
 
-const string &Channel::getTopicWhoTime() const {
+string Channel::getTopicWhoTime() const {
 	return (this->latest_topic_set_user + " " + this->latest_topic_set_time);
 }
 

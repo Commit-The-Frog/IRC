@@ -16,6 +16,7 @@ enum {
 	JOIN,
 	PRIVMSG,
 	TOPIC,
+	INVITE,
 	UNKNOWN
 };
 

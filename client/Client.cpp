@@ -6,18 +6,21 @@ Client::Client() {}
 Client::Client(int client_fd, const string& ip_addr) : client_fd(client_fd), ip_addr(ip_addr), is_passed(false) {}
 Client::~Client() {
 	nick_map.erase(this->nickname);
-	map<string, Channel *>::iterator it = channel_map.find(this->nickname);
-	if (it != channel_map.end()) {
-		Channel &curr_channel = *(it->second);
-		if (curr_channel.isInvited(this->nickname)) {
-			curr_channel.deleteInvite(this->nickname);
-		}
-		if (curr_channel.isOperator(this->nickname)) {
-			curr_channel.deleteOperator(this->nickname);
-		}
-		if (curr_channel.isMember(this->nickname)) {
-			curr_channel.deleteMember(this->nickname, *this);
-		}
+	map<string, Channel *>::iterator it;
+	it = channel_map.begin();
+	while (it != channel_map.end()) {
+		map<string, Channel *>::iterator tmp_it = it;
+		it++;
+		Channel &curr_channel = *(tmp_it->second);
+		curr_channel.deleteInvite(this->nickname, *this);
+		curr_channel.deleteOperator(this->nickname);
+		curr_channel.deleteMember(this->nickname, *this);
+	}
+	it=invite_map.begin();
+	while (it != invite_map.end()) {
+		map<string, Channel *>::iterator tmp_it = it;
+		tmp_it->second->deleteInvite(this->nickname, *this);
+		it++;
 	}
 	cout << this->client_fd << ": " << this->ip_addr << " disconnected" << endl;
 }
@@ -94,12 +97,21 @@ bool Client::getIsPassed() const {
 }
 
 void Client::addChannel(const string &channel_name, Channel &channel) {
-	if (channel_map.find(channel_name) != channel_map.end())
+	if (channel_map.find(channel_name) == channel_map.end())
 		channel_map[channel_name] = &channel;
 }
 
 void Client::deleteChannel(const string &channel_name) {
 	channel_map.erase(channel_name);
+}
+
+void Client::addInvite(const string& channel_name, Channel& channel) {
+	if (invite_map.find(channel_name) == invite_map.end())
+		invite_map[channel_name] = &channel;
+}
+
+void Client::deleteInvite(const string& channel_name) {
+	invite_map.erase(channel_name);
 }
 
 int	Client::getSockFdByNick(const string& nick) {
