@@ -11,6 +11,7 @@
 #include "Unknown.hpp"
 #include "Mode.hpp"
 #include "Join.hpp"
+#include "Topic.hpp"
 #include "Invite.hpp"
 
 
@@ -31,6 +32,7 @@ class CommandFactory
 			cmd_map[MODE] = new Mode(client_map, channel_map);
 			cmd_map[JOIN] = new Join(client_map, this->channel_map);
 			cmd_map[PRIVMSG] = new Privmsg(this->client_map, this->channel_map);
+			cmd_map[TOPIC] = new Topic(this->client_map, this->channel_map);
 			cmd_map[INVITE] = new Invite(client_map, channel_map);
 			cmd_map[UNKNOWN] = new Unknown(client_map, channel_map);
 		};
@@ -60,6 +62,8 @@ class CommandFactory
 				cmd_type = MODE;
 			else if (cmd.compare("PRIVMSG") == 0)
 				cmd_type = PRIVMSG;
+			else if (cmd.compare("TOPIC") == 0)
+				cmd_type = TOPIC;
 			else if (cmd.compare("INVITE") == 0)
 				cmd_type = INVITE;
 			// ...

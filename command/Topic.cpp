@@ -44,7 +44,7 @@ void	Topic::execute(const Parser& parser, int client_fd) {
 		}
 		channel.setTopic(params[1], client);
 		string msg = Reply::getCommonMsg(client, "TOPIC", params[0] + " :" + params[1]);
-		channel.sendToAllMembers(msg, "");
+		channel.sendToAllMembers("", msg);
 		// topic setting
 	}
 }

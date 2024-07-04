@@ -16,7 +16,7 @@ void Join::verificateKey(const Channel &channel, const string &str) {
 	if (channel.getModeOptionK())  {
 		if (channel.getKey() != str) {
 			cout << "channel key : " << channel.getKey() << endl;
-			cout << "input key : " << str << endl; 
+			cout << "input key : " << str << endl;
 			throw Join::JoinVerificateKeyException();
 		}
 	}
@@ -31,7 +31,7 @@ void Join::verificateInvite(const Channel &channel, int client_fd) {
 
 void Join::verificateLimit(const Channel &channel) {
 	if (channel.getModeOptionL()) {
-		if (channel.getLimit() == channel.getMemberMap().size())
+		if (channel.getLimit() <= channel.getMemberMap().size())
 			throw Join::JoinVerificateLimitException();
 	}
 }
@@ -63,8 +63,8 @@ void Join::channelJoinResponse(Client &client, string channel_name)
 	map<string, Client *> member_map = channel.getMemberMap();
 	map<string, Client *> operator_map = channel.getOperatorMap();
 
-	
-	for (map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); it++) { 
+
+	for (map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); it++) {
 		string curr_client_name = it->first;
 		if (channel.isOperator(curr_client_name)) {
 			name_list += "@";
@@ -84,18 +84,19 @@ void Join::channelJoinResponse(Client &client, string channel_name)
 
 void Join::execute(const Parser &parser, int fd)
 {
-	map<string, string> join_map = joinParse(parser.getParams()[0], parser.getParams()[1]); // params 파싱해서 채널네임과 키 짝지어줌
 	Client &client = client_map[fd];
 	string client_name = client.getNickname();
 
-	if (!client.getIsRegistered()) // registered 안되어있을 경우 아무 동작도 안함
-		return ;
+	if (!client.getIsRegistered()) {// registered 안되어있을 경우
+		client.setSendBuff(Reply::getCodeMsg("451", client.getNickname(), ":You have not registered"));
+		return;
+	}
 	if (parser.getParams().size() == 0) // params 없을 경우
 	{
 		client.setSendBuff(Reply::getCodeMsg("461", client_name, " :Not enough parameters"));
 		return ;
 	}
-	std::cout << "params " << endl;
+	map<string, string> join_map = joinParse(parser.getParams()[0], parser.getParams().size() < 2 ? "" : parser.getParams()[1]); // params 파싱해서 채널네임과 키 짝지어줌
 	for (map<string, string>::iterator it_j = join_map.begin(); it_j != join_map.end(); it_j++) {
 		string channel_name = it_j->first;
 		string channel_key = it_j->second;

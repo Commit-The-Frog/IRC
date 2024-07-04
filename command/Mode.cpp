@@ -82,11 +82,14 @@ string Mode::getCurModeString(const Channel& channel) {
 void Mode::execute(const Parser& parser, int client_fd)
 {
 	Client& client = client_map[client_fd];
-
-
 	vector<string> mode_vec;
 	vector<string> changed_mode_vec;
 	vector<string> params = parser.getParams();
+
+	if (!client.getIsRegistered()) {
+		client.setSendBuff(Reply::getCodeMsg("451", client.getNickname(), ":You have not registered"));
+		return;
+	}
 	if (params.size() < 1) { // 461 MODE :Not enough parameters
 		client.setSendBuff(Reply::getCodeMsg("461", client.getNickname(), ":Not enough parameters"));
 		return ;
@@ -104,6 +107,10 @@ void Mode::execute(const Parser& parser, int client_fd)
 		return ;
 	} else { // Mode Setting
 		char	flag = 0;
+		if (!channel.isOperator(client.getNickname())) {
+			client.setSendBuff(Reply::getCodeMsg("482", client.getNickname(), params[0] + " :You're not channel operator"));
+			return ;
+		}
 		for (int i = 0; i < params[1].length(); i++) {
 			if (params[1][i] == '+' || params[1][i] == '-') {
 				flag = params[1][i];
