@@ -30,7 +30,7 @@ Parser::Parser(string& raw) :raw(raw) {
 				current += params[i];
 		}
 	}
-	if (!current.empty())
+	if (!current.empty() || (current.empty() && stop))
 		param_vec.push_back(current);
 }
 

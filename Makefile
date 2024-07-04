@@ -1,6 +1,6 @@
 NAME = ircserv
 CPP = c++
-CPPFLAGS = -MMD -MP -fsanitize=address -std=c++98
+CPPFLAGS = -MMD -MP -fsanitize=address -std=c++98 -g
 SRC = main.cpp \
 	server/Server.cpp \
 	client/Client.cpp \
@@ -8,7 +8,8 @@ SRC = main.cpp \
 	channel/Channel.cpp \
 	command/User.cpp \
 	command/Mode.cpp \
-	command/Join.cpp
+	command/Join.cpp \
+	command/Topic.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
