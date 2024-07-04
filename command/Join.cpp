@@ -75,6 +75,7 @@ void Join::channelJoinResponse(Client &client, string channel_name)
 	}
 	client.setSendBuff(Reply::getCommonMsg(client, "Join ", channel_name));
 	if (channel.getTopic() != "") {
+		// topic 이 있을경우 토픽에 대한 응답
 		client.setSendBuff(Reply::getCodeMsg("332", client.getNickname(), " " + channel_name + " :" + channel.getTopic()));
 		client.setSendBuff(Reply::getCodeMsg("333", client.getNickname(), " " + channel_name + " :" + channel.getTopicWhoTime()));
 	}
