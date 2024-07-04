@@ -17,6 +17,7 @@ class Join : public Command {
 	void verificateKey(const Channel &channel, const string &str);
 	void verificateInvite(const Channel &channel, int client_fd);
 	void verificateLimit(const Channel &channel);
+	void channelJoinResponse(Client &client, string channel_name);
 	class JoinVerificateKeyException : public exception {
 		public :
 			virtual const char* what() const throw();
