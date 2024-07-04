@@ -96,12 +96,22 @@ const string &Channel::getKey() const {
 	return key;
 }
 
-void Channel::setTopic(const string &str) {
+void Channel::setTopic(const string &str, const Client& client) {
+	string user_str = client.getNickname() + "!~" + client.getUsername() + "@" + client.getIpAddr();
+	stringstream ss;
+
+	ss << time(NULL);
 	topic = str;
+	latest_topic_set_user = user_str;
+	latest_topic_set_time = ss.str();
 }
 
 const string &Channel::getTopic() const {
 	return topic;
+}
+
+const string &Channel::getTopicWhoTime() const {
+	return (this->latest_topic_set_user + " " + this->latest_topic_set_time);
 }
 
 void Channel::setLimit(int limit) {

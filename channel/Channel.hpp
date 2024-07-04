@@ -1,6 +1,8 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 #include <map>
+#include <sstream>
+#include <ctime>
 #include "../client/Client.hpp"
 
 using namespace std;
@@ -23,6 +25,8 @@ class Channel
 		std::map<string, Client *> inivite_map;
 		string key;
 		string topic;
+		string latest_topic_set_user;
+		string latest_topic_set_time;
 		int limit;
 		bool options[4];
 	public:
@@ -47,8 +51,9 @@ class Channel
 		bool isInvited(const string &nick) const;
 		void setKey(const string &str);
 		const string &getKey() const;
-		void setTopic(const string &str);
+		void setTopic(const string &str, const Client& client);
 		const string &getTopic() const;
+		const string &getTopicWhoTime() const;
 		void setLimit(int limit);
 		int getLimit() const;
 		bool getModeOptionI() const;
