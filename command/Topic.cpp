@@ -1,5 +1,15 @@
 #include "Topic.hpp"
 
+/*	[Topic::execute]
+	- 만약에 parameter의 size가 1이면,
+	해당 채널의 topic을 받아온다.
+	topic이 설정되어있지 않으면, 331응답.
+	topic이 설정되어있으면 332응답 이후 332응답.
+
+	- 만약에 parameter의 size가 2이상이면,
+	해당 채널의 topic을 설정한다.
+	설정하는 토픽의 길이가 0이면 topic을 현재 설정된 토픽을 지운다.
+*/
 void	Topic::execute(const Parser& parser, int client_fd) {
 	Client& client = client_map[client_fd];
 	vector<string> params = parser.getParams();
