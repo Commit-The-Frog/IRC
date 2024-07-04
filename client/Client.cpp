@@ -7,14 +7,20 @@ Client::Client(int client_fd, const string& ip_addr) : client_fd(client_fd), ip_
 Client::~Client() {
 	nick_map.erase(this->nickname);
 	map<string, Channel *>::iterator it;
-	for (it=channel_map.begin(); it != channel_map.end(); it++) {
-		Channel &curr_channel = *(it->second);
+	it = channel_map.begin();
+	while (it != channel_map.end()) {
+		map<string, Channel *>::iterator tmp_it = it;
+		it++;
+		Channel &curr_channel = *(tmp_it->second);
 		curr_channel.deleteInvite(this->nickname, *this);
 		curr_channel.deleteOperator(this->nickname);
 		curr_channel.deleteMember(this->nickname, *this);
 	}
-	for (it=invite_map.begin(); it!=invite_map.end(); it++) {
-		(*it->second).deleteInvite(this->nickname, *this);
+	it=invite_map.begin();
+	while (it != invite_map.end()) {
+		map<string, Channel *>::iterator tmp_it = it;
+		tmp_it->second->deleteInvite(this->nickname, *this);
+		it++;
 	}
 	cout << this->client_fd << ": " << this->ip_addr << " disconnected" << endl;
 }

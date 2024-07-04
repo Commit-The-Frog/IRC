@@ -21,6 +21,8 @@ class Invite : public Command
 				- 타겟 클라이언트가 이미 타겟 채널에 속한 경우 443
 			- 타겟 채널의 초대 목록에 타겟 클라이언트 추가
 			- 타겟 클라이언트의 초대 목록에 타겟 채널 추가
+			- 발신자에게 RPL_INVITING 응답
+			- 타겟 유저에게 INVITE 메세지 응답
 		*/
 		void execute(const Parser& parser, int client_fd) {
 			vector<string> params = parser.getParams();
@@ -33,20 +35,20 @@ class Invite : public Command
 			map<string, Channel>::iterator it;
 			it = channel_map.find(params[1]);
 			if (it == channel_map.end()) {
-				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), ":No such channel"));
+				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[1] + " :No such channel"));
 				return ;
 			}
 			Channel& targetChannel = it->second;
 			if (targetChannel.getMemberMap().size() < 1) {
-				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), ":No such channel"));
+				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[1] + " :No such channel"));
 				return ;
 			}
 			if (!targetChannel.isMember(sender.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("442", sender.getNickname(), ":You're not on that channel"));
+				sender.setSendBuff(Reply::getCodeMsg("442", sender.getNickname(), params[1] + " :You're not on that channel"));
 				return ;
 			}
 			if (!targetChannel.isOperator(sender.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("482", sender.getNickname(), targetChannel.getChannelName() + " :You're not on that channel"));
+				sender.setSendBuff(Reply::getCodeMsg("482", sender.getNickname(), targetChannel.getChannelName() + " :You're not channel operator"));
 				return ;
 			}
 
@@ -63,6 +65,9 @@ class Invite : public Command
 				return ;
 			}
 			
+			targetChannel.addInvite(receiver.getNickname(), receiver);
+			sender.setSendBuff(Reply::getCodeMsg("341", sender.getNickname(), receiver.getNickname() + " " + targetChannel.getChannelName()));
+			receiver.setSendBuff(Reply::getCommonMsg(sender, "INVITE", receiver.getNickname() + " " + targetChannel.getChannelName()));
 		};
 };
 

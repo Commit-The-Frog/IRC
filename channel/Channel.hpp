@@ -52,7 +52,7 @@ class Channel
 		const string &getKey() const;
 		void setTopic(const string &str, const Client& client);
 		const string &getTopic() const;
-		const string &getTopicWhoTime() const;
+		string getTopicWhoTime() const;
 		void setLimit(int limit);
 		int getLimit() const;
 		bool getModeOptionI() const;
