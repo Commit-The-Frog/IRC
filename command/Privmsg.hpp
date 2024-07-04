@@ -2,6 +2,7 @@
 #define PRIVMSG_HPP_
 
 #include "Command.hpp"
+#include <set>
 
 class Privmsg : public Command
 {
@@ -20,10 +21,11 @@ class Privmsg : public Command
 				- client인 경우 : send_buff에 텍스트 저장
 				- channel인 경우 : sendToAllMembers() 호출
 				- client/channel 못찾은 경우 401
+				- target 중복된 경우 한번만 전송
 		*/
 		void execute(const Parser& parser, int client_fd) {
 			vector<string> params = parser.getParams();
-			vector<string> targets;
+			set<string> targets;
 			string ttbs;
 			Client& sender = client_map[client_fd];
 
@@ -42,10 +44,10 @@ class Privmsg : public Command
 
 			stringstream ss(params[0]);
 			for (string tmp; getline(ss, tmp, ',');)
-				targets.push_back(tmp);
+				targets.insert(tmp);
 			ttbs = sender.getNickname() + " :" + params[1];
 
-			vector<string>::iterator it;
+			set<string>::iterator it;
 			for (it=targets.begin(); it!=targets.end(); it++) {
 				if ((*it)[0] == '#')
 					sendToChannel(sender, it, ttbs);
@@ -53,17 +55,17 @@ class Privmsg : public Command
 					sendToClient(sender, it, ttbs);
 			}
 		}
-		void sendToClient(Client& sender, vector<string>::iterator &it, string& ttbs) {
+		void sendToClient(Client& sender, set<string>::iterator &it, string& ttbs) {
 			try {
 				Client& targetClient = client_map.find(Client::getSockFdByNick(*it))->second;
 				targetClient.setSendBuff(Reply::getCommonMsg(targetClient, "PRIVMSG", ttbs));
 			} catch (Client::NoSuchNickException e) {
-				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + e.what()));
+				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
 				cout << "unknown exception ocuured\n";
 			}
 		}
-		void sendToChannel(Client& sender, vector<string>::iterator &it, string ttbs) {
+		void sendToChannel(Client& sender, set<string>::iterator &it, string ttbs) {
 			try {
 				map<string, Channel>::iterator cit;
 				cit = channel_map.find(*it);
@@ -71,7 +73,7 @@ class Privmsg : public Command
 					throw Channel::NoSuchChannelException();
 				cit->second.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
 			} catch (Channel::NoSuchChannelException& e) {
-				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + e.what()));
+				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
 				cout << "unknown exception ocuured\n";
 			}
