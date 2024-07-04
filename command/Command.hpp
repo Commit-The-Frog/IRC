@@ -17,6 +17,7 @@ enum {
 	PRIVMSG,
 	TOPIC,
 	INVITE,
+	KICK,
 	UNKNOWN
 };
 

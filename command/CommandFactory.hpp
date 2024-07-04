@@ -13,6 +13,7 @@
 #include "Join.hpp"
 #include "Topic.hpp"
 #include "Invite.hpp"
+#include "Kick.hpp"
 
 
 class CommandFactory
@@ -34,6 +35,7 @@ class CommandFactory
 			cmd_map[PRIVMSG] = new Privmsg(this->client_map, this->channel_map);
 			cmd_map[TOPIC] = new Topic(this->client_map, this->channel_map);
 			cmd_map[INVITE] = new Invite(client_map, channel_map);
+			cmd_map[KICK] = new Kick(client_map, channel_map);
 			cmd_map[UNKNOWN] = new Unknown(client_map, channel_map);
 		};
 		~CommandFactory() {
@@ -66,6 +68,8 @@ class CommandFactory
 				cmd_type = TOPIC;
 			else if (cmd.compare("INVITE") == 0)
 				cmd_type = INVITE;
+			else if (cmd.compare("KICK") == 0)
+				cmd_type = KICK;
 			// ...
 			else
 				cmd_type = UNKNOWN;
