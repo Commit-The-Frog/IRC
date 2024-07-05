@@ -21,6 +21,7 @@ class Privmsg : public Command
 				- client인 경우 : send_buff에 텍스트 저장
 				- channel인 경우 : sendToAllMembers() 호출
 				- client/channel 못찾은 경우 401
+				- client가 channel에 속하지 않은 경우 404
 				- target 중복된 경우 한번만 전송
 		*/
 		void execute(const Parser& parser, int client_fd) {
@@ -71,6 +72,11 @@ class Privmsg : public Command
 				cit = channel_map.find(*it);
 				if (cit == channel_map.end())
 					throw Client::NoSuchNickException();
+				Channel& targetChannel = cit->second;
+				if (!targetChannel.isMember(*it)) {
+					sender.setSendBuff(Reply::getCodeMsg("404", sender.getNickname(), targetChannel.getChannelName() + " :Cannot send to channel"));
+					return ;
+				}
 				cit->second.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "PRIVMSG", cit->second.getChannelName() + ttbs));
 			} catch (Client::NoSuchNickException& e) {
 				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
