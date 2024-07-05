@@ -70,9 +70,11 @@ class Kick : public Command
 				target_fd = Client::getSockFdByNick(*it);
 			} catch (Client::NoSuchNickException& e) {
 				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
+				return ;
 			} catch (...) {
 				cout << "unknown exception ocuured\n";
 			}
+			cout << target_fd << endl;
 
 			Client &target = client_map[target_fd];
 
@@ -80,10 +82,11 @@ class Kick : public Command
 				sender.setSendBuff(Reply::getCodeMsg("441", sender.getNickname(), target.getNickname() + " " + targetChannel.getChannelName() + " :They aren't on that channel"));
 				return ;
 			}
+			cout << "targetChannel : " << targetChannel.getChannelName() << endl;
+			targetChannel.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "KICK", targetChannel.getChannelName() + " " + target.getNickname() + " :" + comment));
+
 			targetChannel.deleteOperator(target.getNickname());
 			targetChannel.deleteMember(target.getNickname(), target);
-			
-			targetChannel.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "KICK", targetChannel.getChannelName() + " " + target.getNickname() + " :" + comment));
 		};
 };
 
