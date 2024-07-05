@@ -15,7 +15,7 @@ Parser::Parser(string& raw) :raw(raw) {
 	// parameter 파싱
 	string current;
 	bool stop = false;
-	for (int i = 0; i < params.size(); i++) {
+	for (unsigned int i = 0; i < params.size(); i++) {
 		if (!stop && params[i] == ':') {
 			// :를 만나면 그 뒤로부터는 split하지 않음.
 			stop = true;

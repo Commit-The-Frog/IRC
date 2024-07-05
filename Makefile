@@ -1,6 +1,6 @@
 NAME = ircserv
 CPP = c++
-CPPFLAGS = -MMD -MP -fsanitize=address -std=c++98 -g
+CPPFLAGS =  -Wall -Wextra -Werror -MMD -MP -std=c++98
 SRC = main.cpp \
 	server/Server.cpp \
 	client/Client.cpp \

@@ -10,7 +10,7 @@ class Unknown: public Command {
 		virtual void execute(const Parser& parser, int client_fd) {
 			Client&	client = this->client_map[client_fd];
 
-			if (!client.getIsRegistered()) {
+			if (!client.getIsRegistered() || parser.getRaw().length() == 0) {
 				return ;
 			} else {
 				client.setSendBuff(Reply::getCodeMsg("421", client.getNickname(), parser.getCmd() + " :Unknown command"));

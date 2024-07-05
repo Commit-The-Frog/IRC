@@ -3,7 +3,7 @@
 map<string, int> Client::nick_map;
 
 Client::Client() {}
-Client::Client(int client_fd, const string& ip_addr) : client_fd(client_fd), ip_addr(ip_addr), is_passed(false) {}
+Client::Client(int client_fd, const string& ip_addr) : client_fd(client_fd), is_passed(false), ip_addr(ip_addr) {}
 Client::~Client() {
 	nick_map.erase(this->nickname);
 	map<string, Channel *>::iterator it;
