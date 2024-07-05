@@ -94,6 +94,10 @@ void Mode::execute(const Parser& parser, int client_fd)
 		client.setSendBuff(Reply::getCodeMsg("461", client.getNickname(), ":Not enough parameters"));
 		return ;
 	}
+	if (params[0].at(0) != '#' ) {
+		// 아무 동작도 하지 않고 리턴
+		return ;
+	}
 	map<string, Channel>::iterator it;
 	if ((it = channel_map.find(params[0])) == channel_map.end()) {
 		client.setSendBuff(Reply::getCodeMsg("403", client.getNickname(), params[0] + " :No such channel"));
@@ -242,7 +246,9 @@ void Mode::execute(const Parser& parser, int client_fd)
 				break;
 		}
 	}
-	if (changed_mode_vec.size() > 0)
+	if (changed_mode_vec.size() > 0) {
 		client.setSendBuff(Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
+		channel.sendToAllMembers(client.getNickname() , Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
+	}
 }
 
