@@ -57,19 +57,19 @@ void Channel::deleteMember(const string &nick, Client &client) {
 	client.deleteChannel(channel_name);
 }
 
-void Channel::changeMemberName(const string &prevnick, const string &chagenick) {
+void Channel::changeMemberName(const string &prevnick, const string &changenick) {
 	if (isMember(prevnick)) {
 		Client *temp = member_map.find(prevnick)->second;
 		member_map.erase(prevnick);
-		member_map[chagenick] = temp;
+		member_map[changenick] = temp;
 	}
 	if (isOperator(prevnick)) {
 		operator_set.erase(prevnick);
-		operator_set.insert(chagenick);
+		operator_set.insert(changenick);
 	}
 	if (isInvited(prevnick)) {
 		invite_set.erase(prevnick);
-		invite_set.insert(chagenick);
+		invite_set.insert(changenick);
 	}
 }
 
