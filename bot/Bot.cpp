@@ -13,7 +13,7 @@ void Bot::parseMsg(string str) {
 		string msg;
 		ss >> nick;
 		ss >> colon;
-		ss >> msg;
+		getline(ss, msg);
 
 		cout << nick << " : " << msg << endl;
 		reverse(msg.begin(), msg.end());
