@@ -45,7 +45,7 @@ class Privmsg : public Command
 			stringstream ss(params[0]);
 			for (string tmp; getline(ss, tmp, ',');)
 				targets.insert(tmp);
-			ttbs = sender.getNickname() + " :" + params[1];
+			ttbs = " :" + params[1];
 
 			set<string>::iterator it;
 			for (it=targets.begin(); it!=targets.end(); it++) {
@@ -58,7 +58,7 @@ class Privmsg : public Command
 		void sendToClient(Client& sender, set<string>::iterator &it, string& ttbs) {
 			try {
 				Client& targetClient = client_map.find(Client::getSockFdByNick(*it))->second;
-				targetClient.setSendBuff(Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
+				targetClient.setSendBuff(Reply::getCommonMsg(sender, "PRIVMSG", sender.getNickname() + ttbs));
 			} catch (Client::NoSuchNickException e) {
 				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
@@ -71,7 +71,7 @@ class Privmsg : public Command
 				cit = channel_map.find(*it);
 				if (cit == channel_map.end())
 					throw Client::NoSuchNickException();
-				cit->second.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
+				cit->second.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "PRIVMSG", cit->second.getChannelName() + ttbs));
 			} catch (Client::NoSuchNickException& e) {
 				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
