@@ -58,7 +58,7 @@ class Privmsg : public Command
 		void sendToClient(Client& sender, set<string>::iterator &it, string& ttbs) {
 			try {
 				Client& targetClient = client_map.find(Client::getSockFdByNick(*it))->second;
-				targetClient.setSendBuff(Reply::getCommonMsg(targetClient, "PRIVMSG", ttbs));
+				targetClient.setSendBuff(Reply::getCommonMsg(sender, "PRIVMSG", ttbs));
 			} catch (Client::NoSuchNickException e) {
 				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 			} catch (...) {
