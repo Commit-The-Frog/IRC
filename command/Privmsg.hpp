@@ -73,7 +73,7 @@ class Privmsg : public Command
 				if (cit == channel_map.end())
 					throw Client::NoSuchNickException();
 				Channel& targetChannel = cit->second;
-				if (!targetChannel.isMember(*it)) {
+				if (!targetChannel.isMember(sender.getNickname())) {
 					sender.setSendBuff(Reply::getCodeMsg("404", sender.getNickname(), targetChannel.getChannelName() + " :Cannot send to channel"));
 					return ;
 				}
