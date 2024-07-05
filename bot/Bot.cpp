@@ -66,7 +66,6 @@ Bot::Bot(string server_ip, string server_port, string server_pwd) : server_ip(se
 }
 
 void Bot::connectToServer() {
-	stringstream	init_ss;
 	string			init_string;
 	string			source;
 	string			command;
@@ -98,7 +97,6 @@ void Bot::connectToServer() {
 }
 
 void Bot::run() {
-	stringstream	init_ss;
 	string			init_string;
 	int				init = 2;
 	struct kevent	listen_event[2];
