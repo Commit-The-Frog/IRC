@@ -44,6 +44,7 @@ class Channel
 		void deleteMember(const string &nick, Client &client);
 		void addInvite(const string &nick, Client& client);
 		void deleteInvite(const string &nick, Client& client);
+		void changeMemberName(const string &prevnick, const string &chagnick);
 		const std::map<string, Client*> &getMemberMap() const;
 		bool isOperator(const string &nick) const;
 		bool isMember(const string &nick) const;

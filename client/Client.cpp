@@ -52,8 +52,25 @@ void Client::setNickname(const string& new_nick) {
 		throw Client::AlreadyInUseNickException();
 	if (this->nickname.length() > 0)
 		nick_map.erase(this->nickname);
+	const string &temp_nick = this->getNickname();
 	this->nickname = new_nick;
 	nick_map[new_nick] = this->client_fd;
+
+	map<string, Channel *>::iterator it;
+	it = channel_map.begin();
+	while (it != channel_map.end()) {
+		map<string, Channel *>::iterator tmp_it = it;
+		it++;
+		Channel &curr_channel = *(tmp_it->second);
+		curr_channel.changeMemberName(temp_nick, new_nick);
+	}
+	it = invite_map.begin();
+	while (it != invite_map.end()) {
+		map<string, Channel *>::iterator tmp_it = it;
+		it++;
+		Channel &curr_channel = *(tmp_it->second);
+		curr_channel.changeMemberName(temp_nick, new_nick);
+	}
 }
 
 string Client::getNickname() const {
