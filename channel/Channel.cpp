@@ -73,6 +73,16 @@ void Channel::changeMemberName(const string &prevnick, const string &changenick)
 	}
 }
 
+void Channel::initial() {
+	options[MODE_I] = false;
+	options[MODE_T] = true;
+	options[MODE_K] = false;
+	options[MODE_L] = false;
+	key = "";
+	topic = "";
+	limit = 0;
+}
+
 void Channel::addInvite(const string &nick, Client& client) {
 	invite_set.insert(nick);
 	client.addInvite(channel_name, *this);
