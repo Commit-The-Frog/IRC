@@ -83,7 +83,7 @@ class Kick : public Command
 				return ;
 			}
 			cout << "targetChannel : " << targetChannel.getChannelName() << endl;
-			targetChannel.sendToAllMembers(sender.getNickname(), Reply::getCommonMsg(sender, "KICK", targetChannel.getChannelName() + " " + target.getNickname() + " :" + comment));
+			targetChannel.sendToAllMembers("", Reply::getCommonMsg(sender, "KICK", targetChannel.getChannelName() + " " + target.getNickname() + " :" + comment));
 
 			targetChannel.deleteOperator(target.getNickname());
 			targetChannel.deleteMember(target.getNickname(), target);
