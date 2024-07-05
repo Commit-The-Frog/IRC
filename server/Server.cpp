@@ -142,7 +142,6 @@ void	Server::registerClient(std::vector<struct kevent>& change_list) {
 void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 	char			buffer[512];
 	unsigned long	clrf_idx;
-	Command			*cmd;
 
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes <= 0) {

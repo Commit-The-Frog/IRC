@@ -94,10 +94,6 @@ void Mode::execute(const Parser& parser, int client_fd)
 		client.setSendBuff(Reply::getCodeMsg("461", client.getNickname(), ":Not enough parameters"));
 		return ;
 	}
-	if (params[0].at(0) != '#' ) {
-		// 아무 동작도 하지 않고 리턴
-		return ;
-	}
 	map<string, Channel>::iterator it;
 	if ((it = channel_map.find(params[0])) == channel_map.end()) {
 		client.setSendBuff(Reply::getCodeMsg("403", client.getNickname(), params[0] + " :No such channel"));
@@ -115,7 +111,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 			client.setSendBuff(Reply::getCodeMsg("482", client.getNickname(), params[0] + " :You're not channel operator"));
 			return ;
 		}
-		for (int i = 0; i < params[1].length(); i++) {
+		for (size_t i = 0; i < params[1].length(); i++) {
 			if (params[1][i] == '+' || params[1][i] == '-') {
 				flag = params[1][i];
 				continue;
@@ -205,7 +201,6 @@ void Mode::execute(const Parser& parser, int client_fd)
 					continue;
 				}
 				if (cur_str[0] == '+') {
-					Client& target_client = client_map[client_fd];
 					if (!channel.isMember(sub_str)) {
 						client.setSendBuff(Reply::getCodeMsg("441", client.getNickname(), \
 							sub_str + " " + params[0] + " :They aren't on that channel"));

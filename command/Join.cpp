@@ -31,7 +31,7 @@ void Join::verificateInvite(const Channel &channel, int client_fd) {
 
 void Join::verificateLimit(const Channel &channel) {
 	if (channel.getModeOptionL()) {
-		if (channel.getLimit() <= channel.getMemberMap().size())
+		if (static_cast<size_t>(channel.getLimit()) <= channel.getMemberMap().size())
 			throw Join::JoinVerificateLimitException();
 	}
 }
