@@ -44,7 +44,7 @@ class Server {
 		void	registerClient(std::vector<struct kevent>& change_list);
 		void	recvEventFromClient(struct kevent *curr_event, Client& client);
 		void	sendEventToClient(struct kevent *curr_event, Client& client);
-		void	disconnectClient(int client_fd, map<int, Client>& client_map);
+		void	disconnectClient(int client_fd);
 		void	changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags);
 
 		class ServerSocketBindException : public exception {
