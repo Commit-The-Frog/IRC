@@ -224,7 +224,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 					int	limit;
 					stringstream ss(sub_str);
 					ss >> limit;
-					if (ss.fail())
+					if (ss.fail() || limit <= 0)
 						continue;
 					channel.setLimit(limit);
 					changed_mode_vec.push_back(*it);
