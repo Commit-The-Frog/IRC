@@ -16,7 +16,7 @@ Channel &Channel::operator=(const Channel &channel) {
 	channel_name = channel.channel_name;
 	operator_set = channel.operator_set;
 	member_map = channel.member_map;
-	invite_set = channel.invite_set;
+	invite_map = channel.invite_map;
 	key = channel.key;
 	topic = channel.topic;
 	for (int i = 0; i < 4; i++)
@@ -28,6 +28,10 @@ Channel::~Channel() {
 	for (std::map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); it++) {
 		Client *client = it->second;
 		client->deleteChannel(this->channel_name);
+	}
+	for (std::map<string, Client *>::iterator it = invite_map.begin(); it != invite_map.end(); it++) {
+		Client *client = it->second;
+		client->deleteInvite(this->channel_name);
 	}
 }
 
@@ -68,8 +72,8 @@ void Channel::changeMemberName(const string &prevnick, const string &changenick)
 		operator_set.insert(changenick);
 	}
 	if (isInvited(prevnick)) {
-		invite_set.erase(prevnick);
-		invite_set.insert(changenick);
+		invite_map[changenick] = invite_map[prevnick];
+		invite_map.erase(prevnick);
 	}
 }
 
@@ -84,12 +88,12 @@ void Channel::initial() {
 }
 
 void Channel::addInvite(const string &nick, Client& client) {
-	invite_set.insert(nick);
+	invite_map[nick] = &client;
 	client.addInvite(channel_name, *this);
 }
 
 void Channel::deleteInvite(const string &nick, Client& client) {
-	invite_set.erase(nick);
+	invite_map.erase(nick);
 	client.deleteInvite(channel_name);
 }
 
@@ -106,7 +110,7 @@ bool Channel::isMember(const string &nick) const {
 }
 
 bool Channel::isInvited(const string &nick) const {
-	return invite_set.find(nick) != invite_set.end();
+	return invite_map.find(nick) != invite_map.end();
 }
 
 void Channel::setKey(const string &str) {
