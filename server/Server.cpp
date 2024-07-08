@@ -99,7 +99,7 @@ void	Server::run() {
 			curr_event = &event_list[i];
 			it = client_map.find(curr_event->ident);
 			if (curr_event->flags & EV_EOF) {
-				disconnectClient(curr_event->ident, client_map);
+				disconnectClient(curr_event->ident);
 				continue;
 			}
 			if (curr_event->filter == EVFILT_READ) {
@@ -185,7 +185,15 @@ void	Server::sendEventToClient(struct kevent *curr_event, Client &client) {
 	}
 }
 
-void	Server::disconnectClient(int client_fd, map<int, Client>&client_map) {
+void	Server::disconnectClient(int client_fd) {
 	close(client_fd);
 	client_map.erase(client_fd);
+	map<string, Channel>::iterator it = channel_map.begin();
+	while ( it != channel_map.end()) {
+		map<string, Channel>::iterator tmp_it = it;
+		it++;
+		if (tmp_it->second.getMemberMap().size() < 1) {
+			channel_map.erase(tmp_it->first);
+		}
+	}
 }
