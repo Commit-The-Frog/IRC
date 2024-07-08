@@ -136,8 +136,8 @@ void Bot::run() {
 			}
 		} else if (curr_event.filter == EVFILT_WRITE) {
 			if (send_buff.length() > 0) {
-				send(sock_fd, send_buff.c_str(), send_buff.size(), MSG_DONTWAIT);
-				send_buff.clear();
+				if (send(sock_fd, send_buff.c_str(), send_buff.size(), MSG_DONTWAIT) > 0)
+					send_buff.clear();
 			}
 		}
 	}
