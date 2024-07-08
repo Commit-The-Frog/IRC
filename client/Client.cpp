@@ -12,15 +12,14 @@ Client::~Client() {
 		map<string, Channel *>::iterator tmp_it = it;
 		it++;
 		Channel &curr_channel = *(tmp_it->second);
-		curr_channel.deleteInvite(this->nickname, *this);
 		curr_channel.deleteOperator(this->nickname);
 		curr_channel.deleteMember(this->nickname, *this);
 	}
 	it=invite_map.begin();
 	while (it != invite_map.end()) {
 		map<string, Channel *>::iterator tmp_it = it;
-		tmp_it->second->deleteInvite(this->nickname, *this);
 		it++;
+		tmp_it->second->deleteInvite(this->nickname, *this);
 	}
 	cout << this->client_fd << ": " << this->ip_addr << " disconnected" << endl;
 }
