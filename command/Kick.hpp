@@ -52,7 +52,7 @@ class Kick : public Command
 				sender.setSendBuff(Reply::getCodeMsg("482", sender.getNickname(), targetChannel.getChannelName() + " :You're not channel operator"));
 				return ;
 			}
-			
+
 			stringstream ss(params[1]);
 			for (string tmp; getline(ss, tmp, ',');)
 				targets.insert(tmp);
@@ -62,6 +62,8 @@ class Kick : public Command
 			for (sit=targets.begin(); sit!=targets.end(); sit++) {
 				kickClient(sender, targetChannel, sit, comment);
 			}
+			if (targetChannel.getMemberMap().size() < 1)
+				channel_map.erase(params[0]);
 		};
 
 		void kickClient(Client& sender, Channel& targetChannel, set<string>::iterator& it, string& comment) {
