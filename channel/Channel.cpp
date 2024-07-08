@@ -73,7 +73,7 @@ void Channel::changeMemberName(const string &prevnick, const string &changenick)
 	}
 	if (isInvited(prevnick)) {
 		invite_map[changenick] = invite_map[prevnick];
-		invite_map[prevnick];
+		invite_map.erase(prevnick);
 	}
 }
 
