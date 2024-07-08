@@ -87,28 +87,28 @@ void Mode::execute(const Parser& parser, int client_fd)
 	vector<string> params = parser.getParams();
 
 	if (!client.getIsRegistered()) {
-		client.setSendBuff(Reply::getCodeMsg("451", client.getNickname(), ":You have not registered"));
+		client.addSendBuff(Reply::getCodeMsg("451", client.getNickname(), ":You have not registered"));
 		return;
 	}
 	if (params.size() < 1) { // 461 MODE :Not enough parameters
-		client.setSendBuff(Reply::getCodeMsg("461", client.getNickname(), ":Not enough parameters"));
+		client.addSendBuff(Reply::getCodeMsg("461", client.getNickname(), ":Not enough parameters"));
 		return ;
 	}
 	map<string, Channel>::iterator it;
 	if ((it = channel_map.find(params[0])) == channel_map.end()) {
-		client.setSendBuff(Reply::getCodeMsg("403", client.getNickname(), params[0] + " :No such channel"));
+		client.addSendBuff(Reply::getCodeMsg("403", client.getNickname(), params[0] + " :No such channel"));
 		return ;
 		// ERR_NOSUCHCHANNEL (403)
 	}
 	Channel& channel = it->second;
 	if (params.size() == 1) { // RPL_CHANNELMODEIS (324)
 		string cur_mode_str = getCurModeString(channel);
-		client.setSendBuff(Reply::getCodeMsg("324", client.getNickname(), params[0] + " " + cur_mode_str));
+		client.addSendBuff(Reply::getCodeMsg("324", client.getNickname(), params[0] + " " + cur_mode_str));
 		return ;
 	} else { // Mode Setting
 		char	flag = 0;
 		if (!channel.isOperator(client.getNickname())) {
-			client.setSendBuff(Reply::getCodeMsg("482", client.getNickname(), params[0] + " :You're not channel operator"));
+			client.addSendBuff(Reply::getCodeMsg("482", client.getNickname(), params[0] + " :You're not channel operator"));
 			return ;
 		}
 		for (size_t i = 0; i < params[1].length(); i++) {
@@ -125,7 +125,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 				stringstream ss;
 				ss << params[1][i];
 				ss << " :is unknown mode char to me";
-				client.setSendBuff(Reply::getCodeMsg("472", client.getNickname(), ss.str()));
+				client.addSendBuff(Reply::getCodeMsg("472", client.getNickname(), ss.str()));
 				return ;
 			}
 		}
@@ -197,12 +197,12 @@ void Mode::execute(const Parser& parser, int client_fd)
 				try {
 					client_fd = Client::getSockFdByNick(sub_str);
 				} catch (Client::NoSuchNickException &e) {
-					client.setSendBuff(Reply::getCodeMsg("401", client.getNickname(), sub_str + " :No such nick/channel"));
+					client.addSendBuff(Reply::getCodeMsg("401", client.getNickname(), sub_str + " :No such nick/channel"));
 					continue;
 				}
 				if (cur_str[0] == '+') {
 					if (!channel.isMember(sub_str)) {
-						client.setSendBuff(Reply::getCodeMsg("441", client.getNickname(), \
+						client.addSendBuff(Reply::getCodeMsg("441", client.getNickname(), \
 							sub_str + " " + params[0] + " :They aren't on that channel"));
 					} else if (!channel.isOperator(sub_str)) {
 						changed_mode_vec.push_back(*it);
@@ -210,7 +210,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 					}
 				} else {
 					if (!channel.isMember(sub_str)) {
-						client.setSendBuff(Reply::getCodeMsg("441", client.getNickname(), \
+						client.addSendBuff(Reply::getCodeMsg("441", client.getNickname(), \
 							sub_str + " " + params[0] + " :They aren't on that channel"));
 					} else if (channel.isOperator(sub_str)) {
 						changed_mode_vec.push_back(*it);
@@ -242,7 +242,7 @@ void Mode::execute(const Parser& parser, int client_fd)
 		}
 	}
 	if (changed_mode_vec.size() > 0) {
-		client.setSendBuff(Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
+		client.addSendBuff(Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
 		channel.sendToAllMembers(client.getNickname() , Reply::getCommonMsg(client, "MODE", params[0] + " " + getModeString(changed_mode_vec)));
 	}
 }

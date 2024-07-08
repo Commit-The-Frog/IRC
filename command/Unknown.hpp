@@ -13,7 +13,7 @@ class Unknown: public Command {
 			if (!client.getIsRegistered() || parser.getRaw().length() == 0) {
 				return ;
 			} else {
-				client.setSendBuff(Reply::getCodeMsg("421", client.getNickname(), parser.getCmd() + " :Unknown command"));
+				client.addSendBuff(Reply::getCodeMsg("421", client.getNickname(), parser.getCmd() + " :Unknown command"));
 			}
 		}
 };

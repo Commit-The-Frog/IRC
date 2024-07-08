@@ -97,8 +97,12 @@ string Client::getIpAddr() const {
 	return ip_addr;
 }
 
-void Client::setSendBuff(const string& data) {
+void Client::addSendBuff(const string& data) {
 	this->send_buff.append(data);
+}
+
+void Client::setSendBuff(const string& data) {
+	this->send_buff = data;
 }
 
 bool Client::getIsRegistered() const {

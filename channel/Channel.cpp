@@ -183,6 +183,6 @@ void Channel::setModeOptionL(bool flag) {
 void Channel::sendToAllMembers(const string &sender, const string &msg) {
 	for (std::map<string, Client *>::iterator it = member_map.begin(); it != member_map.end(); ++it) {
 		if (it->second->getNickname().compare(sender) != 0)
-			it->second->setSendBuff(msg);
+			it->second->addSendBuff(msg);
 	}
 }

@@ -23,28 +23,28 @@ class Nick: public Command
 			if (!client.getIsPassed())
 				return ;
 			if (params.size() == 0) {
-				client.setSendBuff(Reply::getCodeMsg("431", client.getNickname(), ":No nickname given"));
+				client.addSendBuff(Reply::getCodeMsg("431", client.getNickname(), ":No nickname given"));
 			} else {
 				nick = params[0];
 				try {
 					if (nick.find(' ') != string::npos || nick[0] == '&' || nick[0] == '#') {
-						client.setSendBuff(Reply::getCodeMsg("432", client.getNickname(), nick + " :Erroneus nickname"));
+						client.addSendBuff(Reply::getCodeMsg("432", client.getNickname(), nick + " :Erroneus nickname"));
 						return ;
 					}
 					if (!client.getIsRegistered()) {
 						client.setNickname(nick);
 						if (client.getIsRegistered()) {
-							client.setSendBuff(Reply::getCodeMsg("001", client.getNickname(), \
+							client.addSendBuff(Reply::getCodeMsg("001", client.getNickname(), \
 								":Welcome to the FT_IRC Network, " + client.getNickname()));
 							cout << "connection established" << endl;
 						}
 					} else {
 						string reply = Reply::getCommonMsg(client, "NICK", ":"+nick);
 						client.setNickname(nick);
-						client.setSendBuff(reply);
+						client.addSendBuff(reply);
 					}
 				} catch (Client::AlreadyInUseNickException& e) {
-					client.setSendBuff(Reply::getCodeMsg("433", client.getNickname(), nick + " :Nickname is already in use"));
+					client.addSendBuff(Reply::getCodeMsg("433", client.getNickname(), nick + " :Nickname is already in use"));
 				} catch (Client::SameNickException& e) {}
 			}
 		}
