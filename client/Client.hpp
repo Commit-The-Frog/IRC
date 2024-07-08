@@ -38,11 +38,12 @@ class Client
 		void setRealname(const string&);
 		string getRealname() const;
 		string getIpAddr() const;
+		void addSendBuff(const string& data);
 		void addRecvBuff(const string& data);
-		void setRecvBuff(const string& data);
-		string getRecvBuff() const;
-		string getSendBuff() const;
 		void setSendBuff(const string& data);
+		void setRecvBuff(const string& data);
+		string getSendBuff() const;
+		string getRecvBuff() const;
 		void clearSendBuff();
 		bool getIsRegistered() const;
 		void setIsPassedTrue();

@@ -70,14 +70,14 @@ void Join::channelJoinResponse(Client &client, string channel_name)
 		name_list += curr_client_name;
 		name_list += " ";
 	}
-	client.setSendBuff(Reply::getCommonMsg(client, "Join ", channel_name));
+	client.addSendBuff(Reply::getCommonMsg(client, "Join ", channel_name));
 	if (channel.getTopic() != "") {
 		// topic 이 있을경우 토픽에 대한 응답
-		client.setSendBuff(Reply::getCodeMsg("332", client.getNickname(), " " + channel_name + " :" + channel.getTopic()));
-		client.setSendBuff(Reply::getCodeMsg("333", client.getNickname(), " " + channel_name + " :" + channel.getTopicWhoTime()));
+		client.addSendBuff(Reply::getCodeMsg("332", client.getNickname(), " " + channel_name + " :" + channel.getTopic()));
+		client.addSendBuff(Reply::getCodeMsg("333", client.getNickname(), " " + channel_name + " :" + channel.getTopicWhoTime()));
 	}
-	client.setSendBuff(Reply::getCodeMsg("353", client.getNickname(), "= " + channel_name + " :" + name_list));
-	client.setSendBuff(Reply::getCodeMsg("366", client.getNickname(), channel_name + " :End of /NAMES list"));
+	client.addSendBuff(Reply::getCodeMsg("353", client.getNickname(), "= " + channel_name + " :" + name_list));
+	client.addSendBuff(Reply::getCodeMsg("366", client.getNickname(), channel_name + " :End of /NAMES list"));
 }
 
 void Join::execute(const Parser &parser, int fd)
@@ -86,12 +86,12 @@ void Join::execute(const Parser &parser, int fd)
 	string client_name = client.getNickname();
 
 	if (!client.getIsRegistered()) {// registered 안되어있을 경우
-		client.setSendBuff(Reply::getCodeMsg("451", client.getNickname(), ":You have not registered"));
+		client.addSendBuff(Reply::getCodeMsg("451", client.getNickname(), ":You have not registered"));
 		return;
 	}
 	if (parser.getParams().size() == 0) // params 없을 경우
 	{
-		client.setSendBuff(Reply::getCodeMsg("461", client_name, " :Not enough parameters"));
+		client.addSendBuff(Reply::getCodeMsg("461", client_name, " :Not enough parameters"));
 		return ;
 	}
 	map<string, string> join_map = joinParse(parser.getParams()[0], parser.getParams().size() < 2 ? "" : parser.getParams()[1]); // params 파싱해서 채널네임과 키 짝지어줌
@@ -99,7 +99,7 @@ void Join::execute(const Parser &parser, int fd)
 		string channel_name = it_j->first;
 		string channel_key = it_j->second;
 		if (channel_name.at(0) != '#') { // 유효한 채널 네임인지 확인 (# 붙어있어야함)
-			client.setSendBuff(Reply::getCodeMsg("403",client_name, channel_name + " :No such channel"));
+			client.addSendBuff(Reply::getCodeMsg("403",client_name, channel_name + " :No such channel"));
 			continue;
 		}
 		map<string, Channel>::iterator it = channel_map.find(channel_name);
@@ -116,17 +116,17 @@ void Join::execute(const Parser &parser, int fd)
 					verificateKey(curr_channel, channel_key); // key 검증
 					verificateLimit(curr_channel); // limit 검증
 					verificateInvite(curr_channel,fd);  // invite 검증
-				} 
+				}
 				curr_channel.addMember(client_name, client); // 채널에 추가
 				channelJoinResponse(client, channel_name); // 조인 응답
 				curr_channel.sendToAllMembers(client_name, Reply::getCommonMsg(client, "JOIN", channel_name)); // 채널에 속한 모든 멤버에게 해당 클라이언트가 입장햇음을 알림
 				cout << client_name << "join in" << channel_name << endl;
 			} catch(Join::JoinVerificateKeyException &e) {
-				client.setSendBuff(Reply::getCodeMsg("475", client_name, channel_name + " :Cannot join channel (+k)"));
+				client.addSendBuff(Reply::getCodeMsg("475", client_name, channel_name + " :Cannot join channel (+k)"));
 			} catch (Join::JoinVerificateLimitException &e) {
-				client.setSendBuff(Reply::getCodeMsg("471", client_name, channel_name + " :Cannot join channel (+l)"));
+				client.addSendBuff(Reply::getCodeMsg("471", client_name, channel_name + " :Cannot join channel (+l)"));
 			} catch (Join::JoinVerificateInviteException &e) {
-				client.setSendBuff(Reply::getCodeMsg("473", client_name, channel_name + " :Cannot join channel (+i)"));
+				client.addSendBuff(Reply::getCodeMsg("473", client_name, channel_name + " :Cannot join channel (+i)"));
 			}
 		} else { // 새로 만든 채널일 경우
 			channel_map[channel_name] = Channel(channel_name); // 채널 생성후 채널리스트에 추가

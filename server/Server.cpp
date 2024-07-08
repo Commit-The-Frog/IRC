@@ -177,11 +177,14 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 */
 void	Server::sendEventToClient(struct kevent *curr_event, Client &client) {
 	if (client.getSendBuff() != "") {
-		int bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(), MSG_DONTWAIT);
-		if (bytes < 0)
+		int send_bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(), MSG_DONTWAIT);
+		if (send_bytes < 0) {
 			return ;
-		else
+		} else if (send_bytes < client.getSendBuff().size()) {
+			client.setSendBuff(client.getSendBuff().substr(send_bytes));
+		} else {
 			client.clearSendBuff();
+		}
 	}
 }
 

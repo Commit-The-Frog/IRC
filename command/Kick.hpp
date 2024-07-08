@@ -30,26 +30,26 @@ class Kick : public Command
 			Client& sender = client_map[client_fd];
 
 			if (params.size() < 2) {
-				sender.setSendBuff(Reply::getCodeMsg("461", sender.getNickname(), ":Not enough parameters"));
+				sender.addSendBuff(Reply::getCodeMsg("461", sender.getNickname(), ":Not enough parameters"));
 				return ;
 			}
 			map<string, Channel>::iterator it;
 			it = channel_map.find(params[0]);
 			if (it == channel_map.end()) {
-				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[0] + " :No such channel"));
+				sender.addSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[0] + " :No such channel"));
 				return ;
 			}
 			Channel& targetChannel = it->second;
 			if (targetChannel.getMemberMap().size() < 1) {
-				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[0] + " :No such channel"));
+				sender.addSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[0] + " :No such channel"));
 				return ;
 			}
 			if (!targetChannel.isMember(sender.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("442", sender.getNickname(), params[1] + " :You're not on that channel"));
+				sender.addSendBuff(Reply::getCodeMsg("442", sender.getNickname(), params[1] + " :You're not on that channel"));
 				return ;
 			}
 			if (!targetChannel.isOperator(sender.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("482", sender.getNickname(), targetChannel.getChannelName() + " :You're not channel operator"));
+				sender.addSendBuff(Reply::getCodeMsg("482", sender.getNickname(), targetChannel.getChannelName() + " :You're not channel operator"));
 				return ;
 			}
 
@@ -71,7 +71,7 @@ class Kick : public Command
 			try {
 				target_fd = Client::getSockFdByNick(*it);
 			} catch (Client::NoSuchNickException& e) {
-				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
+				sender.addSendBuff(Reply::getCodeMsg("401", sender.getNickname(), *it + " " + e.what()));
 				return ;
 			} catch (...) {
 				cout << "unknown exception ocuured\n";
@@ -81,7 +81,7 @@ class Kick : public Command
 			Client &target = client_map[target_fd];
 
 			if (!targetChannel.isMember(target.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("441", sender.getNickname(), target.getNickname() + " " + targetChannel.getChannelName() + " :They aren't on that channel"));
+				sender.addSendBuff(Reply::getCodeMsg("441", sender.getNickname(), target.getNickname() + " " + targetChannel.getChannelName() + " :They aren't on that channel"));
 				return ;
 			}
 			cout << "targetChannel : " << targetChannel.getChannelName() << endl;

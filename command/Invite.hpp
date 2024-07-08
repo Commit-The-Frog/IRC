@@ -29,26 +29,26 @@ class Invite : public Command
 			Client& sender = client_map[client_fd];
 
 			if (params.size() != 2) {
-				sender.setSendBuff(Reply::getCodeMsg("461", sender.getNickname(), ":Not enough parameters"));
+				sender.addSendBuff(Reply::getCodeMsg("461", sender.getNickname(), ":Not enough parameters"));
 				return ;
 			}
 			map<string, Channel>::iterator it;
 			it = channel_map.find(params[1]);
 			if (it == channel_map.end()) {
-				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[1] + " :No such channel"));
+				sender.addSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[1] + " :No such channel"));
 				return ;
 			}
 			Channel& targetChannel = it->second;
 			if (targetChannel.getMemberMap().size() < 1) {
-				sender.setSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[1] + " :No such channel"));
+				sender.addSendBuff(Reply::getCodeMsg("403", sender.getNickname(), params[1] + " :No such channel"));
 				return ;
 			}
 			if (!targetChannel.isMember(sender.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("442", sender.getNickname(), params[1] + " :You're not on that channel"));
+				sender.addSendBuff(Reply::getCodeMsg("442", sender.getNickname(), params[1] + " :You're not on that channel"));
 				return ;
 			}
 			if (!targetChannel.isOperator(sender.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("482", sender.getNickname(), targetChannel.getChannelName() + " :You're not channel operator"));
+				sender.addSendBuff(Reply::getCodeMsg("482", sender.getNickname(), targetChannel.getChannelName() + " :You're not channel operator"));
 				return ;
 			}
 
@@ -56,18 +56,18 @@ class Invite : public Command
 			try {
 				receiver_fd = Client::getSockFdByNick(params[0]);
 			} catch (const Client::NoSuchNickException& e) {
-				sender.setSendBuff(Reply::getCodeMsg("401", sender.getNickname(), params[0] + " :No such nick/channel"));
+				sender.addSendBuff(Reply::getCodeMsg("401", sender.getNickname(), params[0] + " :No such nick/channel"));
 				return ;
 			}
 			Client& receiver = client_map[receiver_fd];
 			if (targetChannel.isMember(receiver.getNickname())) {
-				sender.setSendBuff(Reply::getCodeMsg("443", sender.getNickname(), receiver.getNickname() + " " + targetChannel.getChannelName() + " :is already on channel"));
+				sender.addSendBuff(Reply::getCodeMsg("443", sender.getNickname(), receiver.getNickname() + " " + targetChannel.getChannelName() + " :is already on channel"));
 				return ;
 			}
-			
+
 			targetChannel.addInvite(receiver.getNickname(), receiver);
-			sender.setSendBuff(Reply::getCodeMsg("341", sender.getNickname(), receiver.getNickname() + " " + targetChannel.getChannelName()));
-			receiver.setSendBuff(Reply::getCommonMsg(sender, "INVITE", receiver.getNickname() + " " + targetChannel.getChannelName()));
+			sender.addSendBuff(Reply::getCodeMsg("341", sender.getNickname(), receiver.getNickname() + " " + targetChannel.getChannelName()));
+			receiver.addSendBuff(Reply::getCommonMsg(sender, "INVITE", receiver.getNickname() + " " + targetChannel.getChannelName()));
 		};
 };
 
