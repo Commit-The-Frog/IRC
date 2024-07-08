@@ -136,8 +136,14 @@ void Bot::run() {
 			}
 		} else if (curr_event.filter == EVFILT_WRITE) {
 			if (send_buff.length() > 0) {
-				send(sock_fd, send_buff.c_str(), send_buff.size(), MSG_DONTWAIT);
-				send_buff.clear();
+				ssize_t send_size = send(sock_fd, send_buff.c_str(), send_buff.size(), MSG_DONTWAIT);
+				if (send_size < 0) {
+					return ;
+				} else if (static_cast<size_t>(send_size) < send_buff.size()) {
+					send_buff.substr(send_size);
+				} else {
+					send_buff.clear();
+				}
 			}
 		}
 	}
