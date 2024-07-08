@@ -113,9 +113,10 @@ void Join::execute(const Parser &parser, int fd)
 				verificateLimit(curr_channel); // limit 검증
 				verificateInvite(curr_channel,fd);  // invite 검증
 				curr_channel.addMember(client_name, client); // 채널에 추가
+				curr_channel.deleteInvite(client_name, client); // 초대 목록에서 삭제
 				channelJoinResponse(client, channel_name); // 조인 응답
 				curr_channel.sendToAllMembers(client_name, Reply::getCommonMsg(client, "JOIN", channel_name)); // 채널에 속한 모든 멤버에게 해당 클라이언트가 입장햇음을 알림
-				cout << client_name << "join in" << channel_name << endl;
+				cout << client_name << " join in " << channel_name << endl;
 			} catch(Join::JoinVerificateKeyException &e) {
 				client.addSendBuff(Reply::getCodeMsg("475", client_name, channel_name + " :Cannot join channel (+k)"));
 			} catch (Join::JoinVerificateLimitException &e) {
