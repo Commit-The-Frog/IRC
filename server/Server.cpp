@@ -98,6 +98,10 @@ void	Server::run() {
 		for (int i = 0; i < event_cnt; i++) {
 			curr_event = &event_list[i];
 			it = client_map.find(curr_event->ident);
+			if (curr_event->flags & EV_EOF) {
+				disconnectClient(curr_event->ident, client_map);
+				continue;
+			}
 			if (curr_event->filter == EVFILT_READ) {
 				if (static_cast<int>(curr_event->ident) == serv_sock_fd) {
 					registerClient(change_list);
@@ -145,7 +149,7 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 
 	int bytes = recv(curr_event->ident, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes <= 0) {
-		disconnectClient(curr_event->ident, client_map);
+		return ;
 	} else {
 		buffer[bytes] = '\0';
 		client.addRecvBuff(buffer);
@@ -173,11 +177,9 @@ void	Server::recvEventFromClient(struct kevent *curr_event, Client &client) {
 */
 void	Server::sendEventToClient(struct kevent *curr_event, Client &client) {
 	if (client.getSendBuff() != "") {
-		int bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(),0);
+		int bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(), MSG_DONTWAIT);
 		if (bytes < 0)
-		{
-			disconnectClient(curr_event->ident, client_map);
-		}
+			return ;
 		else
 			client.clearSendBuff();
 	}
