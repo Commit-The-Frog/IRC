@@ -180,7 +180,7 @@ void	Server::sendEventToClient(struct kevent *curr_event, Client &client) {
 		int send_bytes = send(curr_event->ident, client.getSendBuff().c_str(), client.getSendBuff().size(), MSG_DONTWAIT);
 		if (send_bytes < 0) {
 			return ;
-		} else if (send_bytes < client.getSendBuff().size()) {
+		} else if (static_cast<size_t>(send_bytes) < client.getSendBuff().size()) {
 			client.setSendBuff(client.getSendBuff().substr(send_bytes));
 		} else {
 			client.clearSendBuff();
