@@ -23,7 +23,7 @@ class Channel
 		string channel_name;
 		std::map<string, Client *> member_map;
 		set<string> operator_set;
-		set<string> invite_set;
+		std::map<string, Client *> invite_map;
 		string key;
 		string topic;
 		string latest_topic_set_user;
